@@ -20,7 +20,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
 
   app.enableCors({
-    origin: [frontendUrl, 'http://localhost:3000'],
+    origin: true, // Allow all origins for the Vercel deployments
     credentials: true,
   });
 
