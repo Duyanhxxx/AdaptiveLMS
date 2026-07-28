@@ -28,7 +28,12 @@ export function QuizTaker({ quizId, onSubmitted }: QuizTakerProps) {
 
   const startMutation = useMutation({
     mutationFn: () => submissionsService.create(quizId),
-    onSuccess: (sub) => setSubmissionId(sub.id),
+    onSuccess: (sub) => {
+      setSubmissionId(sub.id);
+      if (sub.status !== 'DRAFT') {
+        setSubmitted(true);
+      }
+    },
   });
 
   const submitMutation = useMutation({

@@ -81,8 +81,8 @@ export class SubmissionsService {
       where: {
         studentId,
         quizId: dto.quizId,
-        status: SubmissionStatus.DRAFT,
       },
+      orderBy: { createdAt: 'desc' },
     });
 
     if (existing) return this.findOne(existing.id, studentId, Role.STUDENT);
