@@ -1,5 +1,5 @@
-import { LessonItem } from './components/lesson-item';
 'use client';
+import { LessonItem } from './components/lesson-item';
 
 import { useState } from 'react';
 import Link from 'next/link';
