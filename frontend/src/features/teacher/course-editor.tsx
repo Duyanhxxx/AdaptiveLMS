@@ -123,7 +123,7 @@ export function CourseEditor({ courseId }: { courseId: string }) {
               key={lesson.id}
               lesson={lesson}
               index={index}
-              total={editor.lessons.data.length}
+              total={editor.lessons?.data.length ?? 0}
               editing={editor.editingLessonId === lesson.id}
               onEdit={() => editor.setEditingLessonId(lesson.id)}
               onCancelEdit={() => editor.setEditingLessonId(null)}
@@ -135,13 +135,13 @@ export function CourseEditor({ courseId }: { courseId: string }) {
               }}
               onMoveUp={() => {
                 if (index === 0) return;
-                const ids = [...editor.lessons.data.map((l) => l.id)];
+                const ids = [...(editor.lessons?.data.map((l) => l.id) ?? [])];
                 [ids[index - 1], ids[index]] = [ids[index], ids[index - 1]];
                 editor.reorderLessons.mutate(ids);
               }}
               onMoveDown={() => {
-                if (index >= editor.lessons.data.length - 1) return;
-                const ids = [...editor.lessons.data.map((l) => l.id)];
+                if (index >= (editor.lessons?.data.length ?? 0) - 1) return;
+                const ids = [...(editor.lessons?.data.map((l) => l.id) ?? [])];
                 [ids[index], ids[index + 1]] = [ids[index + 1], ids[index]];
                 editor.reorderLessons.mutate(ids);
               }}
