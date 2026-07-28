@@ -20,4 +20,7 @@ export const notificationsService = {
 
   markAllRead: () =>
     apiClient<{ message: string }>('/notifications/read-all', { method: 'PATCH' }),
+
+  broadcast: (data: { title: string; message: string; type: string }) =>
+    apiClient<{ message: string }>('/notifications/broadcast', { method: 'POST', body: data }),
 };

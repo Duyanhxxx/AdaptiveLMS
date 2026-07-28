@@ -18,5 +18,7 @@ export const usersService = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+
+  getMyProfile: () => apiClient<any>('/users/me/profile'),
 };
 

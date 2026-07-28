@@ -45,6 +45,12 @@ export class UsersController {
     return this.usersService.findStudents(query);
   }
 
+  @Get('me/profile')
+  @ApiOperation({ summary: 'Get current user full profile' })
+  getMyProfile(@CurrentUser('sub') userId: string) {
+    return this.usersService.getProfile(userId);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get user by ID' })
   findOne(

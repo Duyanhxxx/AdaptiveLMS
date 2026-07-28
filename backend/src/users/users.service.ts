@@ -138,6 +138,54 @@ export class UsersService {
     });
   }
 
+  async getProfile(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        avatarUrl: true,
+        createdAt: true,
+        studentProfile: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const enrollments = await this.prisma.courseEnrollment.findMany({
+      where: { studentId: userId },
+      include: {
+        course: {
+          select: {
+            id: true,
+            title: true,
+            difficulty: true,
+            thumbnailUrl: true,
+            _count: { select: { lessons: true } },
+          },
+        },
+      },
+      orderBy: { lastAccessedAt: 'desc' },
+    });
+
+    const history = await this.prisma.learningHistory.findMany({
+      where: { studentId: userId },
+      orderBy: { timestamp: 'desc' },
+      take: 20,
+      include: {
+        lesson: { select: { title: true } },
+        quiz: { select: { title: true } },
+      },
+    });
+
+    return { ...user, enrollments, history };
+  }
+
   private assertCanView(id: string, requesterId: string, role: Role) {
     if (role === Role.ADMIN || role === Role.TEACHER) return;
     if (id !== requesterId) {

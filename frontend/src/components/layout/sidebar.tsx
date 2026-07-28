@@ -10,6 +10,8 @@ import {
   LogOut,
   Sparkles,
   Users,
+  Megaphone,
+  UserCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
@@ -19,6 +21,7 @@ const studentLinks = [
   { href: '/student/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/courses', label: 'Courses', icon: BookOpen },
   { href: '/recommendations', label: 'AI Insights', icon: Sparkles },
+  { href: '/profile', label: 'Hồ sơ của tôi', icon: UserCircle },
 ];
 
 const teacherLinks = [
@@ -27,12 +30,15 @@ const teacherLinks = [
   { href: '/teacher/courses', label: 'My Courses', icon: BookOpen },
   { href: '/teacher/grading', label: 'Grading', icon: ClipboardCheck },
   { href: '/courses', label: 'Browse', icon: BookOpen },
+  { href: '/profile', label: 'Hồ sơ của tôi', icon: UserCircle },
 ];
 
 const adminLinks = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/courses', label: 'Courses', icon: BookOpen },
   { href: '/admin/users', label: 'Users', icon: Users },
+  { href: '/admin/broadcast', label: 'Thông báo', icon: Megaphone },
+  { href: '/profile', label: 'Hồ sơ của tôi', icon: UserCircle },
 ];
 
 const roleColors: Record<string, string> = {

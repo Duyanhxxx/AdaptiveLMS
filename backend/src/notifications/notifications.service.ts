@@ -23,6 +23,21 @@ export class NotificationsService {
     });
   }
 
+  async broadcast(dto: Omit<CreateNotificationDto, 'userId'>) {
+    const users = await this.prisma.user.findMany({ select: { id: true } });
+    
+    await this.prisma.notification.createMany({
+      data: users.map((u) => ({
+        userId: u.id,
+        title: dto.title,
+        message: dto.message,
+        type: (dto.type ?? NotificationType.INFO) as NotificationType,
+      })),
+    });
+
+    return { message: `Broadcasted to ${users.length} users` };
+  }
+
   async listMine(userId: string) {
     return this.prisma.notification.findMany({
       where: { userId },

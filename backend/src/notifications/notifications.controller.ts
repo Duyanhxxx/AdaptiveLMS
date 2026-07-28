@@ -14,7 +14,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Role } from '@prisma/client';
 import { PaginationQueryDto } from '../common/dto/pagination.dto';
 import { NotificationsService } from './notifications.service';
-import { CreateNotificationDto } from './dto/create-notification.dto';
+import { CreateNotificationDto, BroadcastNotificationDto } from './dto/create-notification.dto';
 import type { JwtPayload } from '../common/decorators/current-user.decorator';
 
 @ApiTags('Notifications')
@@ -28,6 +28,13 @@ export class NotificationsController {
   @ApiOperation({ summary: 'Create a notification (admin only)' })
   create(@Body() dto: CreateNotificationDto) {
     return this.notificationsService.create(dto);
+  }
+
+  @Post('broadcast')
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Broadcast a notification to all users' })
+  broadcast(@Body() dto: BroadcastNotificationDto) {
+    return this.notificationsService.broadcast(dto);
   }
 
   @Get('mine')

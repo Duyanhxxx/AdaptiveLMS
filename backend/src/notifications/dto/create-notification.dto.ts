@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
 import { NotificationType } from '@prisma/client';
 import { IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
@@ -22,4 +22,6 @@ export class CreateNotificationDto {
   @IsEnum(NotificationType)
   type?: NotificationType;
 }
+
+export class BroadcastNotificationDto extends OmitType(CreateNotificationDto, ['userId'] as const) {}
 
