@@ -22,5 +22,5 @@ export const notificationsService = {
     apiClient<{ message: string }>('/notifications/read-all', { method: 'PATCH' }),
 
   broadcast: (data: { title: string; message: string; type: string }) =>
-    apiClient<{ message: string }>('/notifications/broadcast', { method: 'POST', body: data }),
+    apiClient<{ message: string }>('/notifications/broadcast', { method: 'POST', body: JSON.stringify(data) }),
 };
