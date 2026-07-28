@@ -12,7 +12,7 @@ export default function DashboardLayout({
       <div className="flex min-h-screen bg-mesh">
         <Sidebar />
         <div className="flex flex-1 flex-col overflow-hidden">
-          <header className="flex h-14 shrink-0 items-center justify-end border-b border-border/60 bg-card/50 px-6 backdrop-blur">
+          <header className="flex h-14 shrink-0 items-center justify-end border-b border-border/60 bg-card/50 px-6 backdrop-blur z-50">
             <NotificationBell />
           </header>
           <main className="flex-1 overflow-auto">

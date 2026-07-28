@@ -77,15 +77,27 @@ export class SubmissionsService {
       throw new NotFoundException('Quiz not found');
     }
 
-    const existing = await this.prisma.submission.findFirst({
+    const completed = await this.prisma.submission.findFirst({
       where: {
         studentId,
         quizId: dto.quizId,
+        status: { not: SubmissionStatus.DRAFT },
       },
       orderBy: { createdAt: 'desc' },
     });
 
-    if (existing) return this.findOne(existing.id, studentId, Role.STUDENT);
+    if (completed) return this.findOne(completed.id, studentId, Role.STUDENT);
+
+    const draft = await this.prisma.submission.findFirst({
+      where: {
+        studentId,
+        quizId: dto.quizId,
+        status: SubmissionStatus.DRAFT,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (draft) return this.findOne(draft.id, studentId, Role.STUDENT);
 
     const maxScore = quiz.questions.reduce((sum, q) => sum + q.points, 0);
 

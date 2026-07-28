@@ -110,7 +110,7 @@ export default function LessonDetailPage({
                   </div>
                   {user?.role === 'STUDENT' ? (
                     <Button size="sm" onClick={() => setActiveQuiz(quiz.id)}>
-                      Làm bài
+                      Mở Quiz
                     </Button>
                   ) : (
                     <Badge variant="outline">Quiz</Badge>
