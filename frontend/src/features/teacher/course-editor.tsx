@@ -43,7 +43,7 @@ export function CourseEditor({ courseId }: { courseId: string }) {
           <Button
             variant="outline"
             onClick={() =>
-              editor.updateCourse.mutate({ isPublished: !editor.course.isPublished })
+              editor.updateCourse.mutate({ isPublished: !editor.course?.isPublished })
             }
           >
             {editor.course.isPublished ? 'Ẩn khóa học' : 'Xuất bản'}
