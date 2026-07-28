@@ -308,6 +308,28 @@ See [docs/API.md](docs/API.md) for full API reference.
 
 ---
 
+## 💡 Design Decisions & Incomplete Features
+
+### Design Philosophy
+> *"Một giải pháp đơn giản, rõ ràng và hoạt động tốt có thể được đánh giá cao hơn một giải pháp phức tạp nhưng thiếu ổn định, thiếu trọng tâm hoặc khó sử dụng."*
+
+Bám sát tiêu chí cốt lõi này của GFT, dự án Adaptive LMS tập trung tối đa vào tính **ổn định**, **trải nghiệm người dùng mượt mà (UI/UX)** và **đáp ứng đúng trọng tâm** của một hệ thống học tập tích hợp AI cá nhân hóa.
+
+### Quyết định kiến trúc & kỹ thuật (Technical Decisions)
+1. **Kiến trúc tách biệt Frontend/Backend:** Giúp dễ dàng quản lý code, độc lập triển khai (Frontend lên Vercel, Backend lên Railway/Render) mà không làm phức tạp hóa quá trình CI/CD.
+2. **PostgreSQL + Prisma ORM:** Lựa chọn Prisma thay vì TypeORM/Sequelize vì Prisma cung cấp Type-safety tuyệt đối từ Database lên tận Frontend, giảm thiểu tối đa lỗi runtime (null/undefined) và đảm bảo code luôn sạch sẽ, dễ bảo trì.
+3. **Tích hợp Google Gemini AI:** Chọn Gemini API thay vì OpenAI vì tốc độ phản hồi cực nhanh và hỗ trợ tiếng Việt xuất sắc, hoàn toàn phù hợp với bài toán "Tự động chấm điểm bài luận" và "Gợi ý lộ trình cá nhân hóa".
+4. **TailwindCSS + UI Framework:** Lược bỏ việc viết CSS thủ công phức tạp. Sử dụng các Component chuẩn hóa để tập trung tạo ra một giao diện cực kỳ hiện đại (Glassmorphism), mượt mà, tạo ấn tượng mạnh mẽ (WOW effect) cho người dùng ngay từ cái nhìn đầu tiên.
+
+### Những nội dung chưa hoàn thành & Định hướng (Incomplete Features & Future Work)
+Nhằm giữ cho hệ thống hoạt động hoàn hảo và trơn tru nhất trong giới hạn thời gian (7 ngày), một số tính năng phức tạp đã được cân nhắc đưa vào danh sách phát triển tương lai thay vì nhồi nhét gây rủi ro:
+1. **Real-time Notifications (WebSockets):** Hiện tại hệ thống sử dụng polling/REST API thông thường. Việc thêm Socket.io cho thông báo realtime (khi có điểm chấm xong) sẽ được thực hiện ở phase sau để tránh rủi ro treo kết nối trong môi trường deploy miễn phí.
+2. **Hệ thống Caching (Redis):** Tính năng tìm kiếm và tải bài học hiện đang query trực tiếp vào Database. Với lượng dữ liệu khổng lồ trong tương lai, việc tích hợp Redis để cache kết quả là bắt buộc, nhưng bị lược bỏ ở bản MVP này để giảm số lượng container (DevOps) cần cài đặt.
+3. **Video Streaming System:** Các bài học hiện tại tập trung vào Text, Code và Quiz tương tác. Hệ thống encode, lưu trữ và streaming video (như HLS qua AWS S3) đòi hỏi chi phí và kiến trúc phức tạp nên chưa được tích hợp.
+4. **Cổng thanh toán (Payment Gateway):** Để giữ luồng trải nghiệm (User Flow) đơn giản và thông suốt nhất cho việc chấm thi, tính năng mua/bán khóa học qua Stripe/VNPay tạm thời chưa được kết nối.
+
+---
+
 ## License
 
 MIT
