@@ -153,14 +153,19 @@ export function LessonItem({
               value={newQuiz.title}
               onChange={(e) => setNewQuiz({ ...newQuiz, title: e.target.value })}
             />
-            <Input
-              type="number"
-              placeholder="Điểm đạt (%)"
-              value={newQuiz.passingScore}
-              onChange={(e) =>
-                setNewQuiz({ ...newQuiz, passingScore: Number(e.target.value) })
-              }
-            />
+            <div>
+              <Input
+                type="number"
+                placeholder="Điểm đạt (VD: 60)"
+                value={newQuiz.passingScore}
+                onChange={(e) =>
+                  setNewQuiz({ ...newQuiz, passingScore: Number(e.target.value) })
+                }
+              />
+              <p className="text-[10px] text-muted-foreground px-1 mt-1">
+                Phần trăm điểm tối thiểu để qua bài (VD: Nhập 60 tức là cần đúng 60% tổng điểm)
+              </p>
+            </div>
             <div className="flex gap-2">
               <Button size="sm" onClick={onCreateQuiz} disabled={!newQuiz.title}>
                 Tạo quiz

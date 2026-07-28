@@ -16,15 +16,17 @@ export function GradingQueue() {
   const queryClient = useQueryClient();
   const [grading, setGrading] = useState<Record<string, { points: number; feedback: string }>>({});
 
+  const [tab, setTab] = useState<'PENDING' | 'GRADED'>('PENDING');
+
   const { data, isLoading } = useQuery({
-    queryKey: ['pending-submissions'],
-    queryFn: () => submissionsService.getAll({ status: 'SUBMITTED', limit: '20' }),
+    queryKey: ['teacher-submissions', tab],
+    queryFn: () => submissionsService.getAll({ status: tab === 'PENDING' ? 'SUBMITTED' : 'GRADED', limit: '50' }),
   });
 
   const gradeMutation = useMutation({
     mutationFn: submissionsService.gradeEssay,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pending-submissions'] });
+      queryClient.invalidateQueries({ queryKey: ['teacher-submissions'] });
       queryClient.invalidateQueries({ queryKey: ['teacher-dashboard'] });
     },
   });
@@ -42,10 +44,14 @@ export function GradingQueue() {
     },
   });
 
-  const pendingEssays =
+  const displayedEssays =
     data?.data.flatMap((sub) =>
       sub.answers
-        .filter((a) => a.question.type === 'ESSAY' && a.isCorrect === null)
+        .filter(
+          (a) =>
+            a.question.type === 'ESSAY' &&
+            (tab === 'PENDING' ? a.isCorrect === null : a.isCorrect !== null),
+        )
         .map((a) => ({ submission: sub, answer: a })),
     ) ?? [];
 
@@ -57,17 +63,39 @@ export function GradingQueue() {
         icon={ClipboardCheck}
       />
 
+      <div className="flex gap-2">
+        <Button
+          variant={tab === 'PENDING' ? 'default' : 'outline'}
+          onClick={() => setTab('PENDING')}
+        >
+          Chờ chấm
+        </Button>
+        <Button
+          variant={tab === 'GRADED' ? 'default' : 'outline'}
+          onClick={() => setTab('GRADED')}
+        >
+          Đã chấm
+        </Button>
+      </div>
+
       {isLoading ? (
         <Skeleton className="h-64 rounded-2xl" />
-      ) : pendingEssays.length === 0 ? (
+      ) : displayedEssays.length === 0 ? (
         <GlassCard className="p-12 text-center">
           <ClipboardCheck className="mx-auto mb-4 h-10 w-10 text-muted-foreground" />
-          <p className="text-muted-foreground">Không có bài tự luận nào cần chấm.</p>
+          <p className="text-muted-foreground">
+            {tab === 'PENDING'
+              ? 'Không có bài tự luận nào cần chấm.'
+              : 'Chưa có bài tự luận nào đã được chấm.'}
+          </p>
         </GlassCard>
       ) : (
         <div className="space-y-4">
-          {pendingEssays.map(({ submission, answer }) => {
-            const form = grading[answer.id] ?? { points: 0, feedback: '' };
+          {displayedEssays.map(({ submission, answer }) => {
+            const form = grading[answer.id] ?? {
+              points: answer.pointsEarned ?? 0,
+              feedback: answer.feedback ?? '',
+            };
 
             return (
               <GlassCard key={answer.id} className="space-y-4">
@@ -80,7 +108,9 @@ export function GradingQueue() {
                       {submission.quiz.title} · {submission.quiz.lesson.title}
                     </p>
                   </div>
-                  <Badge variant="warning">Chờ chấm</Badge>
+                  <Badge variant={tab === 'PENDING' ? 'warning' : 'success'}>
+                    {tab === 'PENDING' ? 'Chờ chấm' : 'Đã chấm'}
+                  </Badge>
                 </div>
 
                 <div className="rounded-xl bg-secondary/40 p-4">
@@ -145,7 +175,7 @@ export function GradingQueue() {
                     }
                     disabled={gradeMutation.isPending}
                   >
-                    Xác nhận chấm
+                    {tab === 'PENDING' ? 'Xác nhận chấm' : 'Cập nhật điểm'}
                   </Button>
                 </div>
               </GlassCard>

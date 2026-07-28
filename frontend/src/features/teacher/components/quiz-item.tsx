@@ -75,18 +75,28 @@ export function QuizItem({
           />
           {newQuestion.type !== 'ESSAY' && (
             <>
-              <Input
-                placeholder="Các lựa chọn (cách nhau bởi dấu phẩy)"
-                value={newQuestion.options}
-                onChange={(e) => setNewQuestion({ ...newQuestion, options: e.target.value })}
-              />
-              <Input
-                placeholder="Đáp án đúng"
-                value={newQuestion.correctAnswer}
-                onChange={(e) =>
-                  setNewQuestion({ ...newQuestion, correctAnswer: e.target.value })
-                }
-              />
+              <div className="space-y-1">
+                <Input
+                  placeholder="Các lựa chọn (VD: A, B, C, D)"
+                  value={newQuestion.options}
+                  onChange={(e) => setNewQuestion({ ...newQuestion, options: e.target.value })}
+                />
+                <p className="text-[10px] text-muted-foreground px-1">
+                  Nhập các đáp án cách nhau bằng dấu phẩy (VD: Hà Nội, Hồ Chí Minh, Đà Nẵng)
+                </p>
+              </div>
+              <div className="space-y-1">
+                <Input
+                  placeholder="Đáp án đúng (phải khớp chính xác với 1 lựa chọn ở trên)"
+                  value={newQuestion.correctAnswer}
+                  onChange={(e) =>
+                    setNewQuestion({ ...newQuestion, correctAnswer: e.target.value })
+                  }
+                />
+                <p className="text-[10px] text-muted-foreground px-1">
+                  Copy y hệt một trong các lựa chọn trên để máy tự chấm điểm (VD: Hà Nội)
+                </p>
+              </div>
             </>
           )}
           <Input
