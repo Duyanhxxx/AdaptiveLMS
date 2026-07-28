@@ -157,7 +157,7 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
-    const enrollments = await this.prisma.courseEnrollment.findMany({
+    const enrollments = await this.prisma.enrollment.findMany({
       where: { studentId: userId },
       include: {
         course: {
@@ -170,12 +170,12 @@ export class UsersService {
           },
         },
       },
-      orderBy: { lastAccessedAt: 'desc' },
+      orderBy: { enrolledAt: 'desc' },
     });
 
     const history = await this.prisma.learningHistory.findMany({
       where: { studentId: userId },
-      orderBy: { timestamp: 'desc' },
+      orderBy: { createdAt: 'desc' },
       take: 20,
       include: {
         lesson: { select: { title: true } },

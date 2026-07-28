@@ -121,9 +121,7 @@ export default function ProfilePage() {
             ) : (
               <div className="space-y-4">
                 {profile.enrollments?.map((e: any) => {
-                  const progressPct = e.course._count.lessons > 0 
-                    ? Math.round((e.completedLessons.length / e.course._count.lessons) * 100) 
-                    : 0;
+                  const progressPct = e.progress ? Math.round(e.progress) : 0;
 
                   return (
                     <div key={e.id} className="rounded-xl border border-border/40 bg-secondary/20 p-4 transition-colors hover:bg-secondary/40">
@@ -131,7 +129,7 @@ export default function ProfilePage() {
                         <div>
                           <p className="font-semibold">{e.course.title}</p>
                           <p className="text-xs text-muted-foreground">
-                            Đã hoàn thành {e.completedLessons.length} / {e.course._count.lessons} bài học
+                            Khóa học có {e.course._count.lessons} bài học
                           </p>
                         </div>
                         <Badge variant={progressPct === 100 ? 'success' : 'default'}>
@@ -172,7 +170,7 @@ export default function ProfilePage() {
                       {h.action.includes('QUIZ') ? h.quiz?.title : h.lesson?.title}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {timeAgo(h.timestamp)}
+                      {timeAgo(h.createdAt)}
                     </p>
                   </div>
                 ))}
