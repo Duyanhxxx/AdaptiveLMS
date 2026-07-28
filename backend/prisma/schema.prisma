@@ -1,0 +1,317 @@
+// Adaptive LMS - Database Schema
+// PostgreSQL with Prisma ORM
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+enum LearningLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  ESSAY
+}
+
+enum SubmissionStatus {
+  DRAFT
+  SUBMITTED
+  GRADED
+}
+
+enum HistoryAction {
+  LESSON_VIEWED
+  LESSON_COMPLETED
+  QUIZ_STARTED
+  QUIZ_SUBMITTED
+  ASSIGNMENT_SUBMITTED
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  RECOMMENDATION
+}
+
+// ─── Auth ────────────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  firstName    String   @map("first_name")
+  lastName     String   @map("last_name")
+  role         Role     @default(STUDENT)
+  avatarUrl    String?  @map("avatar_url")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  studentProfile  StudentProfile?
+  refreshTokens   RefreshToken[]
+  coursesTeaching Course[]         @relation("CourseTeacher")
+  enrollments     Enrollment[]
+  submissions     Submission[]
+  recommendations Recommendation[]
+  learningHistory LearningHistory[]
+  notifications   Notification[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+// ─── Student ─────────────────────────────────────────────────────────────────
+
+model StudentProfile {
+  id             String        @id @default(uuid())
+  userId         String        @unique @map("user_id")
+  learningLevel  LearningLevel @default(BEGINNER) @map("learning_level")
+  averageScore   Float         @default(0) @map("average_score")
+  learningStreak Int           @default(0) @map("learning_streak")
+  totalTimeSpent Int           @default(0) @map("total_time_spent")
+  weakTopics     String[]      @default([]) @map("weak_topics")
+  strongTopics   String[]      @default([]) @map("strong_topics")
+  lastActiveAt   DateTime?     @map("last_active_at")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("student_profiles")
+}
+
+// ─── Courses & Lessons ───────────────────────────────────────────────────────
+
+model Course {
+  id           String     @id @default(uuid())
+  title        String
+  description  String
+  slug         String     @unique
+  thumbnailUrl String?    @map("thumbnail_url")
+  difficulty   Difficulty @default(BEGINNER)
+  teacherId    String     @map("teacher_id")
+  isPublished  Boolean    @default(false) @map("is_published")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  teacher     User         @relation("CourseTeacher", fields: [teacherId], references: [id])
+  lessons     Lesson[]
+  enrollments Enrollment[]
+
+  @@index([teacherId])
+  @@index([slug])
+  @@map("courses")
+}
+
+model Lesson {
+  id          String     @id @default(uuid())
+  courseId    String     @map("course_id")
+  title       String
+  content     String     @db.Text
+  order       Int        @default(0)
+  duration    Int        @default(30)
+  difficulty  Difficulty @default(BEGINNER)
+  topics      String[]   @default([])
+  isPublished Boolean    @default(false) @map("is_published")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  course          Course            @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  quizzes         Quiz[]
+  learningHistory LearningHistory[]
+
+  @@index([courseId])
+  @@map("lessons")
+}
+
+model Enrollment {
+  id          String    @id @default(uuid())
+  studentId   String    @map("student_id")
+  courseId    String    @map("course_id")
+  progress    Float     @default(0)
+  enrolledAt  DateTime  @default(now()) @map("enrolled_at")
+  completedAt DateTime? @map("completed_at")
+
+  student User   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  course  Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, courseId])
+  @@index([studentId])
+  @@index([courseId])
+  @@map("enrollments")
+}
+
+// ─── Quiz & Questions ────────────────────────────────────────────────────────
+
+model Quiz {
+  id           String   @id @default(uuid())
+  lessonId     String   @map("lesson_id")
+  title        String
+  description  String?
+  timeLimit    Int?     @map("time_limit")
+  passingScore Float    @default(60) @map("passing_score")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  lesson          Lesson            @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  questions       Question[]
+  submissions     Submission[]
+  learningHistory LearningHistory[]
+
+  @@index([lessonId])
+  @@map("quizzes")
+}
+
+model Question {
+  id            String       @id @default(uuid())
+  quizId        String       @map("quiz_id")
+  text          String       @db.Text
+  type          QuestionType @default(MULTIPLE_CHOICE)
+  options       Json?
+  correctAnswer String?      @map("correct_answer")
+  points        Float        @default(1)
+  order         Int          @default(0)
+  topic         String?
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+
+  quiz    Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  answers Answer[]
+
+  @@index([quizId])
+  @@map("questions")
+}
+
+// ─── Submissions ─────────────────────────────────────────────────────────────
+
+model Submission {
+  id          String           @id @default(uuid())
+  studentId   String           @map("student_id")
+  quizId      String           @map("quiz_id")
+  score       Float            @default(0)
+  maxScore    Float            @default(0) @map("max_score")
+  status      SubmissionStatus @default(DRAFT)
+  timeSpent   Int              @default(0) @map("time_spent")
+  submittedAt DateTime?        @map("submitted_at")
+  gradedAt    DateTime?        @map("graded_at")
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  student User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  quiz    Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  answers Answer[]
+
+  @@index([studentId])
+  @@index([quizId])
+  @@map("submissions")
+}
+
+model Answer {
+  id           String   @id @default(uuid())
+  submissionId String   @map("submission_id")
+  questionId   String   @map("question_id")
+  answerText   String   @map("answer_text") @db.Text
+  isCorrect    Boolean? @map("is_correct")
+  pointsEarned Float    @default(0) @map("points_earned")
+  feedback     String?  @db.Text
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  question   Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
+  @@index([questionId])
+  @@map("answers")
+}
+
+// ─── AI & Analytics ──────────────────────────────────────────────────────────
+
+model Recommendation {
+  id                   String        @id @default(uuid())
+  studentId            String        @map("student_id")
+  learningLevel        LearningLevel @map("learning_level")
+  strengths            String[]      @default([])
+  weaknesses           String[]      @default([])
+  recommendedLessonIds String[]      @default([]) @map("recommended_lesson_ids")
+  practicePlan         Json          @map("practice_plan")
+  motivationalFeedback String        @map("motivational_feedback") @db.Text
+  explanation          String        @db.Text
+  createdAt            DateTime      @default(now()) @map("created_at")
+
+  student User @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId])
+  @@map("recommendations")
+}
+
+model LearningHistory {
+  id        String        @id @default(uuid())
+  studentId String        @map("student_id")
+  lessonId  String?       @map("lesson_id")
+  quizId    String?       @map("quiz_id")
+  action    HistoryAction
+  score     Float?
+  timeSpent Int           @default(0) @map("time_spent")
+  topics    String[]      @default([])
+  createdAt DateTime      @default(now()) @map("created_at")
+
+  student User    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  lesson  Lesson? @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  quiz    Quiz?   @relation(fields: [quizId], references: [id], onDelete: SetNull)
+
+  @@index([studentId])
+  @@index([createdAt])
+  @@map("learning_history")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String           @map("user_id")
+  title     String
+  message   String           @db.Text
+  type      NotificationType @default(INFO)
+  isRead    Boolean          @default(false) @map("is_read")
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("notifications")
+}
