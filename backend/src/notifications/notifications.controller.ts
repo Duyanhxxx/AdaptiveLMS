@@ -31,7 +31,7 @@ export class NotificationsController {
   }
 
   @Post('broadcast')
-  @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN, Role.TEACHER)
   @ApiOperation({ summary: 'Broadcast a notification to all users' })
   broadcast(@Body() dto: BroadcastNotificationDto) {
     return this.notificationsService.broadcast(dto);

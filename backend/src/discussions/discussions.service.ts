@@ -68,4 +68,23 @@ export class DiscussionsServiceClass {
       return { action: 'added', type };
     }
   }
+
+  async getTeacherDiscussions(teacherId: string) {
+    return this.prisma.comment.findMany({
+      where: {
+        lesson: { course: { teacherId } },
+        parentId: null, // Only top-level questions
+      },
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true, avatarUrl: true, role: true } },
+        lesson: { select: { id: true, title: true, course: { select: { title: true } } } },
+        replies: {
+          include: {
+            user: { select: { id: true, firstName: true, lastName: true, role: true } },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
 }

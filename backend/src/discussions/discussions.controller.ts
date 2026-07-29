@@ -2,6 +2,8 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { DiscussionsServiceClass } from './discussions.service';
+import { Roles } from '../common/decorators/roles.decorator';
+import { Role } from '@prisma/client';
 
 @ApiTags('Discussions')
 @ApiBearerAuth()
@@ -40,5 +42,12 @@ export class DiscussionsController {
     @CurrentUser('sub') userId: string,
   ) {
     return this.discussionsService.toggleReaction(dto.lessonId, userId, dto.type);
+  }
+
+  @Get('teacher/unanswered')
+  @Roles(Role.TEACHER, Role.ADMIN)
+  @ApiOperation({ summary: 'Get all discussions across teacher courses' })
+  getTeacherDiscussions(@CurrentUser('sub') userId: string) {
+    return this.discussionsService.getTeacherDiscussions(userId);
   }
 }

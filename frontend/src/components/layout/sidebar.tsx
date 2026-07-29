@@ -14,6 +14,8 @@ import {
   UserCircle,
   Calendar,
   Trophy,
+  MessageCircle,
+  BarChart3,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
@@ -30,10 +32,10 @@ const studentLinks = [
 
 const teacherLinks = [
   { href: '/teacher/dashboard', label: 'Tổng quan', icon: LayoutDashboard },
-  { href: '/teacher/student-groups', label: 'Nhóm học sinh', icon: Users },
   { href: '/teacher/courses', label: 'Khóa học của tôi', icon: BookOpen },
   { href: '/teacher/grading', label: 'Chấm bài', icon: ClipboardCheck },
-  { href: '/courses', label: 'Tất cả khóa học', icon: BookOpen },
+  { href: '/teacher/analytics', label: 'Phân tích lớp học', icon: BarChart3 },
+  { href: '/teacher/engagement', label: 'Tương tác & Lịch', icon: MessageCircle },
   { href: '/profile', label: 'Hồ sơ cá nhân', icon: UserCircle },
 ];
 

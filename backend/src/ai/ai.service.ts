@@ -67,6 +67,69 @@ export class AiService {
     }
   }
 
+  async generateQuiz(topic: string, description: string, count: number = 5): Promise<any> {
+    if (!this.genAI) {
+      return this.buildFallbackQuiz(count);
+    }
+
+    try {
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
+      const prompt = `Generate a multiple-choice quiz about "${topic}" (Description: ${description}).
+      It must contain exactly ${count} questions.
+      Output ONLY a valid JSON array of objects, with each object having:
+      - text: the question string
+      - options: an array of 4 string options
+      - correctIndex: the index (0-3) of the correct option
+      - points: 1`;
+      
+      const result = await model.generateContent(prompt);
+      const text = result.response.text();
+      const cleaned = text.replace(/```json\n?|\n?```/g, '').trim();
+      return JSON.parse(cleaned);
+    } catch (error) {
+      this.logGeminiError(error);
+      return this.buildFallbackQuiz(count);
+    }
+  }
+
+  async generateAssignment(topic: string): Promise<any> {
+    if (!this.genAI) {
+      return {
+        title: `Bài tập thực hành: ${topic}`,
+        description: `Hãy viết một bài luận hoặc nộp file code liên quan đến chủ đề ${topic}.`,
+      };
+    }
+
+    try {
+      const model = this.genAI.getGenerativeModel({ model: this.modelName });
+      const prompt = `Generate an assignment for the topic "${topic}".
+      Output ONLY a valid JSON object with:
+      - title: a catchy title string for the assignment
+      - description: a detailed markdown string explaining the assignment requirements and what the student needs to submit`;
+      
+      const result = await model.generateContent(prompt);
+      const text = result.response.text();
+      const cleaned = text.replace(/```json\n?|\n?```/g, '').trim();
+      return JSON.parse(cleaned);
+    } catch (error) {
+      this.logGeminiError(error);
+      return { title: 'Lỗi sinh AI', description: 'Vui lòng thử lại' };
+    }
+  }
+
+  private buildFallbackQuiz(count: number) {
+    const questions = [];
+    for (let i = 0; i < count; i++) {
+      questions.push({
+        text: `Câu hỏi mẫu số ${i + 1} (Do AI đang offline)`,
+        options: ['Đáp án A', 'Đáp án B', 'Đáp án C', 'Đáp án D'],
+        correctIndex: 0,
+        points: 1
+      });
+    }
+    return questions;
+  }
+
   private logGeminiError(error: unknown) {
     const status = (error as { status?: number })?.status;
     const message = error instanceof Error ? error.message : String(error);

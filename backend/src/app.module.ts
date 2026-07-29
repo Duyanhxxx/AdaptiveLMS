@@ -21,6 +21,7 @@ import { DiscussionsModule } from './discussions/discussions.module';
 import { GamificationModule } from './gamification/gamification.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
+import { AssignmentsModule } from './assignments/assignments.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
     NotificationsModule,
     DiscussionsModule,
     GamificationModule,
+    AssignmentsModule,
   ],
   controllers: [AppController],
   providers: [

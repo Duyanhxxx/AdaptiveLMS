@@ -12,6 +12,7 @@ import { analyticsService } from '@/services/analytics.service';
 import { StatCard } from '@/features/dashboard/stat-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { GlassCard } from '@/components/layout/glass-card';
 import { PageHeader } from '@/components/layout/page-header';
@@ -380,15 +381,45 @@ export function TeacherDashboardView() {
             <div className="space-y-4">
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-muted-foreground">Tiêu đề</label>
-                <input type="text" placeholder="Nhập tiêu đề..." className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" />
+                <input 
+                  type="text" 
+                  id="announcement-title"
+                  placeholder="Nhập tiêu đề..." 
+                  className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" 
+                />
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-semibold text-muted-foreground">Nội dung</label>
-                <textarea rows={4} placeholder="Nhập nội dung thông báo..." className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" />
+                <textarea 
+                  id="announcement-message"
+                  rows={4} 
+                  placeholder="Nhập nội dung thông báo..." 
+                  className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" 
+                />
               </div>
               <div className="flex gap-2 justify-end pt-2">
                 <Button variant="outline" onClick={() => setShowAnnouncementModal(false)}>Hủy</Button>
-                <Button>Phát Thông báo</Button>
+                <Button onClick={async () => {
+                  const title = (document.getElementById('announcement-title') as HTMLInputElement).value;
+                  const message = (document.getElementById('announcement-message') as HTMLTextAreaElement).value;
+                  if (!title || !message) return toast.error('Vui lòng nhập đủ thông tin');
+                  
+                  try {
+                    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/notifications/broadcast`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                      },
+                      body: JSON.stringify({ title, message, type: 'SYSTEM' })
+                    });
+                    if (!res.ok) throw new Error('Lỗi');
+                    toast.success('Đã phát thông báo thành công!');
+                    setShowAnnouncementModal(false);
+                  } catch (e) {
+                    toast.error('Có lỗi xảy ra');
+                  }
+                }}>Phát Thông báo</Button>
               </div>
             </div>
           </div>
