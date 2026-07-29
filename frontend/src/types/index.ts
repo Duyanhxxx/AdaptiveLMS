@@ -55,6 +55,7 @@ export interface Lesson {
   duration: number;
   difficulty: string;
   topics: string[];
+  videoUrl?: string | null;
   isPublished: boolean;
 }
 

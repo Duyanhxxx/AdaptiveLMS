@@ -149,6 +149,7 @@ model Lesson {
   duration    Int        @default(30)
   difficulty  Difficulty @default(BEGINNER)
   topics      String[]   @default([])
+  videoUrl    String?    @map("video_url")
   isPublished Boolean    @default(false) @map("is_published")
   createdAt   DateTime   @default(now()) @map("created_at")
   updatedAt   DateTime   @updatedAt @map("updated_at")

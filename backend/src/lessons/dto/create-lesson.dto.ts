@@ -50,6 +50,11 @@ export class CreateLessonDto {
   @IsString({ each: true })
   topics?: string[];
 
+  @ApiPropertyOptional({ example: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' })
+  @IsOptional()
+  @IsString()
+  videoUrl?: string;
+
   @ApiPropertyOptional({ default: false })
   @IsOptional()
   @IsBoolean()
