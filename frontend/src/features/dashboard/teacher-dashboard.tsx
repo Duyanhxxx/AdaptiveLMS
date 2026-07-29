@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { 
   BookOpen, ClipboardCheck, LayoutDashboard, TrendingUp, Users, 
   AlertTriangle, ArrowRight, Calendar as CalendarIcon, Bell, 
-  Megaphone, Clock, CheckCircle2, FileText, Sparkles, BarChart3
+  Megaphone, Clock, CheckCircle2, FileText, Sparkles, BarChart3, Loader2, X
 } from 'lucide-react';
 import Link from 'next/link';
 import { analyticsService } from '@/services/analytics.service';
@@ -32,6 +32,22 @@ const groupBadge: Record<string, 'success' | 'warning' | 'destructive'> = {
 
 export function TeacherDashboardView() {
   const [activeTab, setActiveTab] = useState<'management' | 'grading' | 'analytics'>('management');
+  
+  const [showAIModal, setShowAIModal] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [aiEmailResult, setAiEmailResult] = useState('');
+
+  const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
+
+  const handleGenerateAI = () => {
+    setShowAIModal(true);
+    setIsGenerating(true);
+    setAiEmailResult('');
+    setTimeout(() => {
+      setIsGenerating(false);
+      setAiEmailResult('Chào các em nhóm nguy cơ,\n\nCô/Thầy nhận thấy tiến độ học tập gần đây của các em đang gặp chút khó khăn (Điểm trung bình dưới 50%). Hệ thống AI của chúng ta đã tổng hợp lại các khái niệm các em thường hay sai.\n\nĐừng lo lắng! Cô đã chuẩn bị một số bài tập bổ trợ ngắn và gợi ý tài liệu học thêm dưới đây để các em ôn tập lại. Nếu cần, hãy đặt lịch hẹn với cô trong tuần này nhé.\n\nCố lên nhé!\n\n(Drafted by AI Assistant)');
+    }, 2500);
+  };
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['teacher-dashboard'],
@@ -60,7 +76,7 @@ export function TeacherDashboardView() {
         icon={LayoutDashboard}
         action={
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="font-semibold shadow-sm">
+            <Button variant="outline" size="sm" className="font-semibold shadow-sm" onClick={() => setShowAnnouncementModal(true)}>
               <Megaphone className="mr-1.5 h-4 w-4 text-primary" />
               Tạo Thông báo Mới
             </Button>
@@ -137,7 +153,7 @@ export function TeacherDashboardView() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button size="sm" variant="outline" className="text-xs border-rose-500/30 text-rose-600 font-semibold hover:bg-rose-500/10 shadow-sm transition-all active:scale-95">
+                <Button size="sm" variant="outline" className="text-xs border-rose-500/30 text-rose-600 font-semibold hover:bg-rose-500/10 shadow-sm transition-all active:scale-95" onClick={handleGenerateAI}>
                   <Sparkles className="mr-1.5 h-3.5 w-3.5" /> Dùng AI tạo Email hỗ trợ
                 </Button>
               </div>
@@ -307,6 +323,74 @@ export function TeacherDashboardView() {
                 </div>
               </div>
             </GlassCard>
+          </div>
+        </div>
+      )}
+      {/* AI Generate Email Modal */}
+      {showAIModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl">
+            <Button variant="ghost" size="icon" className="absolute right-4 top-4 rounded-full" onClick={() => setShowAIModal(false)}>
+              <X className="h-4 w-4" />
+            </Button>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-500/20 text-purple-600">
+                <Sparkles className="h-5 w-5" />
+              </div>
+              <h3 className="text-lg font-bold text-foreground">AI Draft: Email Động viên</h3>
+            </div>
+            
+            {isGenerating ? (
+              <div className="flex flex-col items-center justify-center py-10 space-y-4">
+                <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
+                <p className="text-sm text-muted-foreground font-medium animate-pulse">
+                  AI đang phân tích dữ liệu và soạn thảo nội dung...
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4 animate-in slide-in-from-bottom-2">
+                <div className="rounded-xl border border-border bg-secondary/30 p-4 text-sm text-foreground whitespace-pre-wrap leading-relaxed">
+                  {aiEmailResult}
+                </div>
+                <div className="flex gap-2 justify-end pt-2">
+                  <Button variant="outline" onClick={() => handleGenerateAI()}>Thử lại (Re-generate)</Button>
+                  <Button className="bg-purple-600 hover:bg-purple-700 text-white shadow-md">
+                    <Megaphone className="mr-2 h-4 w-4" /> Gửi tới Nhóm Nguy cơ
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Announcement Modal */}
+      {showAnnouncementModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl">
+            <Button variant="ghost" size="icon" className="absolute right-4 top-4 rounded-full" onClick={() => setShowAnnouncementModal(false)}>
+              <X className="h-4 w-4" />
+            </Button>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-500/20 text-blue-600">
+                <Megaphone className="h-5 w-5" />
+              </div>
+              <h3 className="text-lg font-bold text-foreground">Tạo Thông báo Mới</h3>
+            </div>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-muted-foreground">Tiêu đề</label>
+                <input type="text" placeholder="Nhập tiêu đề..." className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-muted-foreground">Nội dung</label>
+                <textarea rows={4} placeholder="Nhập nội dung thông báo..." className="w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" />
+              </div>
+              <div className="flex gap-2 justify-end pt-2">
+                <Button variant="outline" onClick={() => setShowAnnouncementModal(false)}>Hủy</Button>
+                <Button>Phát Thông báo</Button>
+              </div>
+            </div>
           </div>
         </div>
       )}
