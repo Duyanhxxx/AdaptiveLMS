@@ -13,8 +13,8 @@ export function GlassCard({
   return (
     <div
       className={cn(
-        'glass-card rounded-2xl p-6',
-        hover && 'card-hover',
+        'glass-card rounded-xl p-6 transition-all duration-200',
+        hover && 'card-hover cursor-pointer',
         className,
       )}
       {...props}

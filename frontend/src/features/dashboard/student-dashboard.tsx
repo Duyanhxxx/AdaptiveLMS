@@ -1,7 +1,8 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { Award, BookOpen, Flame, Target } from 'lucide-react';
+import { Award, BookOpen, Flame, Target, Sparkles, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 import { analyticsService } from '@/services/analytics.service';
 import { StatCard } from '@/features/dashboard/stat-card';
 import { WeeklyChart } from '@/components/charts/weekly-chart';
@@ -11,6 +12,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { GlassCard } from '@/components/layout/glass-card';
 import { PageHeader } from '@/components/layout/page-header';
+import { Button } from '@/components/ui/button';
 import { formatPercent } from '@/lib/utils';
 
 function getStudentGroupLabel(score: number) {
@@ -27,17 +29,22 @@ export function StudentDashboardView() {
 
   if (isLoading) {
     return (
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-32 rounded-2xl" />
-        ))}
+      <div className="space-y-6">
+        <Skeleton className="h-12 w-64 rounded-lg" />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-28 rounded-xl" />
+          ))}
+        </div>
       </div>
     );
   }
 
   if (error || !data) {
     return (
-      <p className="text-destructive">Failed to load dashboard. Please try again.</p>
+      <GlassCard className="p-8 text-center border-destructive/20 bg-destructive/5">
+        <p className="text-sm font-semibold text-destructive">Không thể tải dữ liệu Dashboard. Vui lòng thử lại sau.</p>
+      </GlassCard>
     );
   }
 
@@ -47,93 +54,115 @@ export function StudentDashboardView() {
     <div className="space-y-8">
       <PageHeader
         title={`Xin chào, ${data.student.name}!`}
-        description="Theo dõi tiến độ học tập và khám phá điểm mạnh của bạn"
+        description="Tổng quan tiến độ học tập, điểm số và gợi ý bài học cá nhân hóa"
         icon={Target}
         action={
           <div className="flex gap-2">
-            <Badge variant="outline">{data.learningLevel}</Badge>
+            <Badge variant="outline" className="font-semibold">{data.learningLevel}</Badge>
             <Badge variant={group.variant}>{group.label}</Badge>
           </div>
         }
       />
 
+      {/* Recommended Lesson AI Banner */}
+      {data.recommendedLesson && (
+        <div className="relative overflow-hidden rounded-xl border border-primary/20 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-6 shadow-sm">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="space-y-1 max-w-xl">
+              <div className="flex items-center gap-2">
+                <Badge variant="primary" className="text-[10px]">
+                  <Sparkles className="mr-1 h-3 w-3" /> AI Đề xuất bài học tiếp theo
+                </Badge>
+              </div>
+              <h3 className="text-lg font-bold text-foreground">{data.recommendedLesson.title}</h3>
+              <p className="text-xs text-muted-foreground">
+                Thời lượng: {data.recommendedLesson.duration} phút · Độ khó: {data.recommendedLesson.difficulty}
+              </p>
+            </div>
+            <Link href={`/courses/${data.recommendedLesson.courseId}/lessons/${data.recommendedLesson.id}`}>
+              <Button className="font-bold shadow-md">
+                Học ngay bài này
+                <ArrowRight className="ml-1.5 h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Metrics Row */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title="Average Score"
-          value={`${data.averageScore}%`}
+          title="Điểm trung bình"
+          value={`${Math.round(data.averageScore)}%`}
           icon={Award}
           color="violet"
         />
         <StatCard
-          title="Learning Streak"
-          value={`${data.learningStreak} days`}
+          title="Chuỗi ngày học (Streak)"
+          value={`${data.learningStreak} ngày 🔥`}
           icon={Flame}
           color="amber"
         />
         <StatCard
-          title="Completion"
+          title="Tỷ lệ hoàn thành"
           value={formatPercent(data.progress.completionPercent)}
           icon={Target}
           color="emerald"
         />
         <StatCard
-          title="Submissions"
+          title="Tổng bài nộp"
           value={data.totalSubmissions}
           icon={BookOpen}
           color="indigo"
         />
       </div>
 
+      {/* Performance Chart & Course Progress */}
       <div className="grid gap-6 lg:grid-cols-2">
         <GlassCard>
-          <h3 className="mb-4 font-semibold">Weekly Performance</h3>
+          <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
+            <h3 className="font-bold text-sm text-foreground">Hiệu suất học tập hàng tuần</h3>
+            <Badge variant="outline" className="text-[10px]">Recent Activity</Badge>
+          </div>
           <WeeklyChart data={data.weeklyPerformance} />
         </GlassCard>
 
-        {data.recommendedLesson && (
-          <GlassCard className="bg-brand-gradient text-white">
-            <p className="text-sm font-medium text-white/70">Recommended Lesson</p>
-            <p className="mt-2 text-xl font-bold">{data.recommendedLesson.title}</p>
-            <p className="mt-2 text-sm text-white/80">
-              {data.recommendedLesson.duration} min · {data.recommendedLesson.difficulty}
-            </p>
+        {data.progress.courses.length > 0 && (
+          <GlassCard>
+            <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
+              <h3 className="font-bold text-sm text-foreground">Tiến độ khóa học của tôi</h3>
+              <Badge variant="outline" className="text-[10px]">{data.progress.courses.length} Khóa học</Badge>
+            </div>
+            <div className="space-y-4">
+              {data.progress.courses.map((course) => (
+                <div key={course.id} className="space-y-1.5 rounded-lg border border-border/50 p-3 bg-secondary/20">
+                  <div className="flex justify-between text-xs font-semibold">
+                    <span className="text-foreground">{course.title}</span>
+                    <span className="text-primary font-bold">{formatPercent(course.progress)}</span>
+                  </div>
+                  <Progress value={course.progress} className="h-2" />
+                </div>
+              ))}
+            </div>
           </GlassCard>
         )}
       </div>
 
+      {/* Strong & Weak Topics */}
       <div className="grid gap-6 lg:grid-cols-2">
         <TopicList
-          title="Strong Topics"
+          title="Chủ đề thế mạnh"
           topics={data.strongTopics}
           variant="success"
-          emptyText="Complete quizzes to discover your strengths"
+          emptyText="Hoàn thành thêm quiz để hệ thống nhận diện điểm mạnh của bạn"
         />
         <TopicList
-          title="Weak Topics"
+          title="Chủ đề cần cải thiện"
           topics={data.weakTopics}
           variant="destructive"
-          emptyText="No weak topics identified yet"
+          emptyText="Tuyệt vời! Chưa có chủ đề yếu nào bị cảnh báo"
         />
       </div>
-
-      {data.progress.courses.length > 0 && (
-        <GlassCard>
-          <h3 className="mb-4 font-semibold">Course Progress</h3>
-          <div className="space-y-5">
-            {data.progress.courses.map((course) => (
-              <div key={course.id}>
-                <div className="mb-2 flex justify-between text-sm">
-                  <span className="font-medium">{course.title}</span>
-                  <span className="text-muted-foreground">
-                    {formatPercent(course.progress)}
-                  </span>
-                </div>
-                <Progress value={course.progress} className="h-2" />
-              </div>
-            ))}
-          </div>
-        </GlassCard>
-      )}
     </div>
   );
 }
