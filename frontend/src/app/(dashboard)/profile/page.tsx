@@ -1,13 +1,15 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { UserCircle, Trophy, BookOpen, Clock, Activity, Target } from 'lucide-react';
+import { UserCircle, Trophy, BookOpen, Clock, Activity, Target, Flame, Sparkles, Award } from 'lucide-react';
+import Link from 'next/link';
 import { usersService } from '@/services/users.service';
 import { Skeleton } from '@/components/ui/skeleton';
 import { GlassCard } from '@/components/layout/glass-card';
 import { PageHeader } from '@/components/layout/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
 
 function timeAgo(dateString: string) {
   const date = new Date(dateString);
@@ -42,7 +44,7 @@ export default function ProfilePage() {
     <div className="space-y-8">
       <PageHeader
         title="Hồ sơ cá nhân"
-        description="Xem tổng quan điểm số, tiến độ học tập và các hoạt động gần đây của bạn"
+        description="Tổng quan năng lực, cấp độ Gamification, tiến độ học tập và bộ sưu tập huy hiệu"
         icon={UserCircle}
       />
 
@@ -54,45 +56,54 @@ export default function ProfilePage() {
               {profile.firstName[0]}
               {profile.lastName[0]}
             </div>
-            <h2 className="mt-4 text-xl font-bold">
+            <h2 className="mt-4 text-xl font-bold text-foreground">
               {profile.firstName} {profile.lastName}
             </h2>
-            <p className="text-sm text-muted-foreground">{profile.email}</p>
-            <Badge className="mt-2" variant="outline">
+            <p className="text-xs text-muted-foreground">{profile.email}</p>
+            <Badge className="mt-2 font-bold" variant="primary">
               {profile.role}
             </Badge>
+          </div>
+
+          {/* Gamification Rank Widget */}
+          <div className="space-y-2 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 text-center">
+            <div className="flex items-center justify-center gap-1.5 text-amber-500 font-bold text-sm">
+              <Trophy className="h-4 w-4" /> Level 5 · Scholar Rank
+            </div>
+            <p className="text-xs font-bold text-foreground">1,450 / 2,000 XP (Kế tiếp: Level 6 Expert)</p>
+            <Progress value={72} className="h-2" />
           </div>
 
           {profile.studentProfile && (
             <div className="space-y-4 border-t border-border/60 pt-4">
               <div className="flex items-center justify-between">
-                <span className="flex items-center text-sm font-medium text-muted-foreground">
-                  <Trophy className="mr-2 h-4 w-4" /> Điểm trung bình
+                <span className="flex items-center text-xs font-medium text-muted-foreground">
+                  <Award className="mr-2 h-4 w-4 text-primary" /> Điểm trung bình
                 </span>
                 <span className="font-bold text-primary">
                   {Math.round(profile.studentProfile.averageScore)}%
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="flex items-center text-sm font-medium text-muted-foreground">
-                  <Activity className="mr-2 h-4 w-4" /> Chuỗi học tập
+                <span className="flex items-center text-xs font-medium text-muted-foreground">
+                  <Flame className="mr-2 h-4 w-4 text-amber-500" /> Chuỗi học tập (Streak)
                 </span>
-                <span className="font-bold text-primary">
-                  {profile.studentProfile.learningStreak} ngày
+                <span className="font-bold text-amber-500">
+                  {profile.studentProfile.learningStreak} ngày 🔥
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="flex items-center text-sm font-medium text-muted-foreground">
-                  <Clock className="mr-2 h-4 w-4" /> Thời gian học
+                <span className="flex items-center text-xs font-medium text-muted-foreground">
+                  <Clock className="mr-2 h-4 w-4 text-emerald-500" /> Thời gian học
                 </span>
-                <span className="font-bold text-primary">
+                <span className="font-bold text-emerald-500">
                   {Math.round(profile.studentProfile.totalTimeSpent / 60)} giờ
                 </span>
               </div>
 
               {profile.studentProfile.strongTopics?.length > 0 && (
                 <div className="pt-2">
-                  <span className="text-xs font-semibold text-muted-foreground">Thế mạnh:</span>
+                  <span className="text-xs font-semibold text-muted-foreground">Chủ đề thế mạnh:</span>
                   <div className="mt-1 flex flex-wrap gap-1">
                     {profile.studentProfile.strongTopics.map((topic: string) => (
                       <Badge key={topic} variant="success" className="text-[10px]">
@@ -107,28 +118,61 @@ export default function ProfilePage() {
         </GlassCard>
 
         <div className="col-span-1 space-y-6 md:col-span-2">
+          {/* Mini Badge Collection Widget */}
+          <GlassCard className="space-y-3">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-amber-500" />
+                <h3 className="font-bold text-sm text-foreground">Bộ sưu tập Huy hiệu nổi bật</h3>
+              </div>
+              <Button asChild variant="outline" size="sm" className="text-xs">
+                <Link href="/achievements">
+                  Xem tất cả (40 Huy hiệu)
+                </Link>
+              </Button>
+            </div>
+            <div className="grid grid-cols-4 gap-3 text-center pt-1">
+              <div className="p-3 rounded-lg border border-border bg-card">
+                <span className="text-2xl">🚀</span>
+                <p className="text-[10px] font-bold text-foreground mt-1">Khai phá LMS</p>
+              </div>
+              <div className="p-3 rounded-lg border border-border bg-card">
+                <span className="text-2xl">⚡</span>
+                <p className="text-[10px] font-bold text-foreground mt-1">Học siêu tốc</p>
+              </div>
+              <div className="p-3 rounded-lg border border-blue-500/40 bg-blue-500/5">
+                <span className="text-2xl">💯</span>
+                <p className="text-[10px] font-bold text-blue-600 dark:text-blue-400 mt-1">Điểm tuyệt đối</p>
+              </div>
+              <div className="p-3 rounded-lg border border-purple-500/40 bg-purple-500/5">
+                <span className="text-2xl">💻</span>
+                <p className="text-[10px] font-bold text-purple-600 dark:text-purple-400 mt-1">JS Specialist</p>
+              </div>
+            </div>
+          </GlassCard>
+
           {/* Enrolled Courses */}
           <GlassCard>
             <div className="mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
               <BookOpen className="h-5 w-5 text-primary" />
-              <h3 className="font-bold">Khóa học đã đăng ký</h3>
+              <h3 className="font-bold text-sm text-foreground">Khóa học đã đăng ký</h3>
             </div>
             
             {profile.enrollments?.length === 0 ? (
-              <p className="py-4 text-center text-sm text-muted-foreground">
+              <p className="py-4 text-center text-xs text-muted-foreground">
                 Bạn chưa đăng ký khóa học nào.
               </p>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {profile.enrollments?.map((e: any) => {
                   const progressPct = e.progress ? Math.round(e.progress) : 0;
 
                   return (
-                    <div key={e.id} className="rounded-xl border border-border/40 bg-secondary/20 p-4 transition-colors hover:bg-secondary/40">
+                    <div key={e.id} className="rounded-xl border border-border/60 bg-secondary/20 p-4 transition-colors hover:bg-secondary/40">
                       <div className="flex flex-wrap items-start justify-between gap-2">
                         <div>
-                          <p className="font-semibold">{e.course.title}</p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="font-bold text-sm text-foreground">{e.course.title}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
                             Khóa học có {e.course._count.lessons} bài học
                           </p>
                         </div>
@@ -148,28 +192,28 @@ export default function ProfilePage() {
           <GlassCard>
             <div className="mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
               <Target className="h-5 w-5 text-primary" />
-              <h3 className="font-bold">Lịch sử hoạt động gần đây</h3>
+              <h3 className="font-bold text-sm text-foreground">Lịch sử hoạt động gần đây</h3>
             </div>
 
             {profile.history?.length === 0 ? (
-              <p className="py-4 text-center text-sm text-muted-foreground">
+              <p className="py-4 text-center text-xs text-muted-foreground">
                 Chưa có hoạt động học tập nào.
               </p>
             ) : (
               <div className="relative space-y-0 pl-4 before:absolute before:bottom-0 before:left-[11px] before:top-2 before:w-[2px] before:bg-border/60">
-                {profile.history?.map((h: any, i: number) => (
-                  <div key={h.id} className="relative pb-6 pl-6 last:pb-0">
+                {profile.history?.map((h: any) => (
+                  <div key={h.id} className="relative pb-5 pl-6 last:pb-0">
                     <div className="absolute left-[-21px] top-1.5 h-3 w-3 rounded-full border-2 border-card bg-primary ring-2 ring-primary/20" />
-                    <p className="text-sm font-medium">
+                    <p className="text-xs font-bold text-foreground">
                       {h.action === 'LESSON_VIEWED' && 'Đã xem bài học'}
-                      {h.action === 'LESSON_COMPLETED' && 'Hoàn thành bài học'}
+                      {h.action === 'LESSON_COMPLETED' && 'Hoàn thành bài học (+10 XP)'}
                       {h.action === 'QUIZ_STARTED' && 'Bắt đầu làm quiz'}
                       {h.action === 'QUIZ_SUBMITTED' && `Nộp quiz (Điểm: ${h.score ? Math.round(h.score) : 0}%)`}
                     </p>
-                    <p className="text-sm text-foreground">
+                    <p className="text-xs text-muted-foreground">
                       {h.action.includes('QUIZ') ? h.quiz?.title : h.lesson?.title}
                     </p>
-                    <p className="mt-1 text-xs text-muted-foreground">
+                    <p className="mt-1 text-[10px] text-muted-foreground">
                       {timeAgo(h.createdAt)}
                     </p>
                   </div>
