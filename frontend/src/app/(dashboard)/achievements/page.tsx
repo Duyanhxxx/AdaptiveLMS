@@ -12,40 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
-interface BadgeSpec {
-  id: string;
-  name: string;
-  category: 'Onboarding' | 'Consistency' | 'Excellence' | 'Skill' | 'Community' | 'Milestone';
-  description: string;
-  condition: string;
-  xp: number;
-  rarity: 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';
-  unlocked: boolean;
-  icon: string;
-}
-
-const badgeCollection: BadgeSpec[] = [
-  { id: '1', name: 'Khai phá LMS', category: 'Onboarding', description: 'Đăng nhập và hoàn thành bài học đầu tiên', condition: 'Hoàn thành 1 bài học', xp: 50, rarity: 'COMMON', unlocked: true, icon: '🚀' },
-  { id: '2', name: 'Học siêu tốc', category: 'Excellence', description: 'Hoàn thành 3 bài học trong cùng 1 ngày', condition: '3 bài học/ngày', xp: 100, rarity: 'COMMON', unlocked: true, icon: '⚡' },
-  { id: '3', name: 'Tân binh Quiz', category: 'Excellence', description: 'Hoàn thành bài Quiz đầu tiên', condition: 'Nộp 1 bài Quiz', xp: 50, rarity: 'COMMON', unlocked: true, icon: '🎯' },
-  { id: '4', name: 'Điểm tuyệt đối', category: 'Excellence', description: 'Đạt điểm 100% trong 1 bài Quiz', condition: 'Đạt 100% điểm', xp: 150, rarity: 'RARE', unlocked: true, icon: '💯' },
-  { id: '5', name: 'Khởi động Streak', category: 'Consistency', description: 'Duy trì chuỗi học 3 ngày liên tục', condition: 'Streak 3 ngày', xp: 100, rarity: 'COMMON', unlocked: true, icon: '🔥' },
-  { id: '6', name: 'Chiến binh Tuần', category: 'Consistency', description: 'Duy trì chuỗi học 7 ngày liên tục', condition: 'Streak 7 ngày', xp: 250, rarity: 'RARE', unlocked: false, icon: '🛡️' },
-  { id: '7', name: 'Huyền thoại Tháng', category: 'Consistency', description: 'Duy trì chuỗi học 30 ngày liên tục', condition: 'Streak 30 ngày', xp: 1000, rarity: 'LEGENDARY', unlocked: false, icon: '👑' },
-  { id: '8', name: 'Cú đêm siêng năng', category: 'Consistency', description: 'Hoàn thành bài học sau 11 giờ đêm', condition: 'Học sau 23:00', xp: 100, rarity: 'RARE', unlocked: true, icon: '🦉' },
-  { id: '9', name: 'Bình minh tri thức', category: 'Consistency', description: 'Hoàn thành bài học trước 7 giờ sáng', condition: 'Học trước 07:00', xp: 100, rarity: 'RARE', unlocked: false, icon: '🌅' },
-  { id: '10', name: 'Chuyên gia JavaScript', category: 'Skill', description: 'Hoàn thành 100% Module JavaScript ES6+', condition: 'Master JavaScript', xp: 300, rarity: 'RARE', unlocked: true, icon: '💻' },
-  { id: '11', name: 'Thần đồng React', category: 'Skill', description: 'Hoàn thành Module React Components', condition: 'Master React', xp: 500, rarity: 'EPIC', unlocked: false, icon: '⚛️' },
-  { id: '12', name: 'Vua Quiz', category: 'Excellence', description: 'Hoàn thành 10 bài Quiz đạt điểm >= 90%', condition: '10 Quiz điểm cao', xp: 500, rarity: 'EPIC', unlocked: false, icon: '🏆' },
-  { id: '13', name: 'Bình luận tích cực', category: 'Community', description: 'Đăng 5 thảo luận dưới bài học', condition: '5 thảo luận', xp: 100, rarity: 'COMMON', unlocked: true, icon: '💬' },
-  { id: '14', name: 'Đồng đội thân thiện', category: 'Community', description: 'Nhận được 10 lượt thả tim từ bạn học', condition: '10 Reactions', xp: 200, rarity: 'RARE', unlocked: false, icon: '❤️' },
-  { id: '15', name: 'Tín đồ Video', category: 'Onboarding', description: 'Xem trọn vẹn 5 Video bài giảng YouTube', condition: 'Xem 5 Video', xp: 150, rarity: 'COMMON', unlocked: true, icon: '🎥' },
-  { id: '16', name: 'Chuyên gia Nộp bài', category: 'Excellence', description: 'Nộp bài tập kéo thả đúng hạn 5 lần', condition: '5 bài tập đúng hạn', xp: 250, rarity: 'RARE', unlocked: true, icon: '📤' },
-  { id: '17', name: 'Bậc thầy AI Prompt', category: 'Skill', description: 'Hỏi Trợ lý AI 10 câu hỏi giải thích', condition: '10 lần dùng AI Assistant', xp: 150, rarity: 'RARE', unlocked: true, icon: '🤖' },
-  { id: '18', name: 'Sưu tầm Chứng chỉ', category: 'Milestone', description: 'Nhận chứng chỉ hoàn thành Khóa học đầu tiên', condition: '1 Chứng chỉ', xp: 750, rarity: 'EPIC', unlocked: false, icon: '📜' },
-  { id: '19', name: 'CLB 1,000 XP', category: 'Milestone', description: 'Tích lũy đạt mốc 1,000 XP', condition: 'Tích lũy 1,000 XP', xp: 300, rarity: 'RARE', unlocked: true, icon: '💎' },
-  { id: '20', name: 'Huyền thoại 5,000 XP', category: 'Milestone', description: 'Tích lũy đạt mốc 5,000 XP', condition: 'Tích lũy 5,000 XP', xp: 1000, rarity: 'LEGENDARY', unlocked: false, icon: '🔮' },
-];
+import { gamificationService } from '@/services/gamification.service';
 
 const rarityStyles = {
   COMMON: 'border-border bg-card text-foreground',
@@ -58,12 +25,35 @@ export default function AchievementsPage() {
   const [filter, setFilter] = useState<'ALL' | 'UNLOCKED' | 'LOCKED'>('ALL');
   const [search, setSearch] = useState('');
 
-  const { data: dashboard, isLoading } = useQuery({
+  const { data: dashboard, isLoading: isLoadingDashboard } = useQuery({
     queryKey: ['student-dashboard'],
     queryFn: analyticsService.getStudentDashboard,
   });
 
-  if (isLoading) return <Skeleton className="h-[600px] w-full rounded-xl" />;
+  const { data: badgesData, isLoading: isLoadingBadges } = useQuery({
+    queryKey: ['my-badges'],
+    queryFn: gamificationService.getMyBadges,
+  });
+
+  if (isLoadingDashboard || isLoadingBadges) return <Skeleton className="h-[600px] w-full rounded-xl" />;
+
+  const earnedIds = new Set(badgesData?.earned.map((ub) => ub.badgeId) || []);
+
+  const badgeCollection = badgesData?.all.map((badge) => {
+    // Determine rarity mock based on category
+    let rarity: 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY' = 'COMMON';
+    let xp = 50;
+    if (badge.category === 'ACHIEVEMENT') { rarity = 'EPIC'; xp = 500; }
+    if (badge.category === 'SPECIAL') { rarity = 'LEGENDARY'; xp = 1000; }
+    if (badge.category === 'SOCIAL') { rarity = 'RARE'; xp = 200; }
+
+    return {
+      ...badge,
+      rarity,
+      xp,
+      unlocked: earnedIds.has(badge.id)
+    };
+  }) || [];
 
   const filteredBadges = badgeCollection.filter((b) => {
     if (filter === 'UNLOCKED' && !b.unlocked) return false;
@@ -72,7 +62,7 @@ export default function AchievementsPage() {
     return true;
   });
 
-  const unlockedCount = badgeCollection.filter((b) => b.unlocked).length;
+  const unlockedCount = badgesData?.earned.length || 0;
 
   return (
     <div className="space-y-8">
