@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usersService } from '@/services/users.service';
+import { gamificationService } from '@/services/gamification.service';
 import { Skeleton } from '@/components/ui/skeleton';
 import { GlassCard } from '@/components/layout/glass-card';
 import { PageHeader } from '@/components/layout/page-header';
@@ -40,6 +41,16 @@ export default function ProfilePage() {
   const { data: profile, isLoading } = useQuery({
     queryKey: ['my-profile'],
     queryFn: usersService.getMyProfile,
+  });
+
+  const { data: badgesData } = useQuery({
+    queryKey: ['my-badges'],
+    queryFn: gamificationService.getMyBadges,
+  });
+
+  const { data: certificates } = useQuery({
+    queryKey: ['my-certificates'],
+    queryFn: gamificationService.getMyCertificates,
   });
 
   if (isLoading) {
@@ -128,18 +139,14 @@ export default function ProfilePage() {
               </div>
             </div>
             <div className="grid grid-cols-4 gap-2 text-center pt-1">
-              <div className="p-2 rounded-lg border border-border bg-card" title="Khai phá LMS">
-                <span className="text-xl">🚀</span>
-              </div>
-              <div className="p-2 rounded-lg border border-border bg-card" title="Học siêu tốc">
-                <span className="text-xl">⚡</span>
-              </div>
-              <div className="p-2 rounded-lg border border-blue-500/40 bg-blue-500/5" title="Điểm tuyệt đối">
-                <span className="text-xl">💯</span>
-              </div>
-              <div className="p-2 rounded-lg border border-purple-500/40 bg-purple-500/5" title="JS Specialist">
-                <span className="text-xl">💻</span>
-              </div>
+              {badgesData?.earned.slice(0, 4).map((userBadge) => (
+                <div key={userBadge.id} className="p-2 rounded-lg border border-border bg-card" title={userBadge.badge.name}>
+                  <span className="text-xl">{userBadge.badge.icon}</span>
+                </div>
+              ))}
+              {(!badgesData?.earned || badgesData.earned.length === 0) && (
+                <p className="col-span-4 text-xs text-muted-foreground py-2">Chưa có huy hiệu nào.</p>
+              )}
             </div>
             <Button asChild variant="ghost" size="sm" className="w-full text-[10px] mt-2 text-primary">
               <Link href="/achievements">Xem tất cả 40 Huy hiệu →</Link>
@@ -217,24 +224,35 @@ export default function ProfilePage() {
                   )}
                 </GlassCard>
 
-                {/* Certificates (Mocked) */}
+                {/* Certificates */}
                 <GlassCard>
                   <div className="mb-4 flex items-center gap-2 border-b border-border/60 pb-3">
                     <Award className="h-5 w-5 text-amber-500" />
                     <h3 className="font-bold text-sm text-foreground">Chứng chỉ (Certificates)</h3>
                   </div>
-                  <div className="space-y-3">
-                    <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 text-center space-y-2">
-                      <Award className="mx-auto h-8 w-8 text-amber-500 opacity-80" />
-                      <div>
-                        <p className="font-bold text-xs text-foreground">Frontend Developer Certificate</p>
-                        <p className="text-[10px] text-muted-foreground mt-1">Cấp ngày: 15/07/2026</p>
-                      </div>
-                      <Button variant="outline" size="sm" className="h-7 text-[10px] mt-2 border-amber-500/30 text-amber-600">
-                        Tải xuống PDF
-                      </Button>
+                  
+                  {!certificates || certificates.length === 0 ? (
+                    <p className="py-4 text-center text-xs text-muted-foreground">Chưa có chứng chỉ nào.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {certificates.map((cert) => (
+                        <div key={cert.id} className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 text-center space-y-2">
+                          <Award className="mx-auto h-8 w-8 text-amber-500 opacity-80" />
+                          <div>
+                            <p className="font-bold text-xs text-foreground">{cert.course.title} Certificate</p>
+                            <p className="text-[10px] text-muted-foreground mt-1">
+                              Cấp ngày: {new Date(cert.issuedAt).toLocaleDateString('vi-VN')}
+                            </p>
+                          </div>
+                          {cert.pdfUrl && (
+                            <Button variant="outline" size="sm" className="h-7 text-[10px] mt-2 border-amber-500/30 text-amber-600" asChild>
+                              <a href={cert.pdfUrl} target="_blank" rel="noopener noreferrer">Tải xuống PDF</a>
+                            </Button>
+                          )}
+                        </div>
+                      ))}
                     </div>
-                  </div>
+                  )}
                 </GlassCard>
               </div>
 
