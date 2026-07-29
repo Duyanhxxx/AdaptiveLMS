@@ -79,7 +79,7 @@ export function StudentDashboardView() {
                 Thời lượng: {data.recommendedLesson.duration} phút · Độ khó: {data.recommendedLesson.difficulty}
               </p>
             </div>
-            <Link href={`/courses/${data.recommendedLesson.courseId}/lessons/${data.recommendedLesson.id}`}>
+            <Link href={data.recommendedLesson.courseId ? `/courses/${data.recommendedLesson.courseId}/lessons/${data.recommendedLesson.id}` : '/courses'}>
               <Button className="font-bold shadow-md">
                 Học ngay bài này
                 <ArrowRight className="ml-1.5 h-4 w-4" />

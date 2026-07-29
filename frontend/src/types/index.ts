@@ -76,6 +76,7 @@ export interface StudentDashboard {
     title: string;
     duration: number;
     difficulty: string;
+    courseId?: string;
   } | null;
   weeklyPerformance: Array<{
     week: string;
