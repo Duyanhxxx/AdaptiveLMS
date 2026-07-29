@@ -58,6 +58,13 @@ enum NotificationType {
   RECOMMENDATION
 }
 
+enum BadgeCategory {
+  LEARNING
+  ACHIEVEMENT
+  SOCIAL
+  SPECIAL
+}
+
 // ─── Auth ────────────────────────────────────────────────────────────────────
 
 model User {
@@ -83,6 +90,8 @@ model User {
   comments        Comment[]
   reactions       LessonReaction[]
   assignmentSubmissions AssignmentSubmission[]
+  badges          UserBadge[]
+  certificates    Certificate[]
 
   @@map("users")
 }
@@ -137,6 +146,7 @@ model Course {
   teacher     User         @relation("CourseTeacher", fields: [teacherId], references: [id])
   lessons     Lesson[]
   enrollments Enrollment[]
+  certificates Certificate[]
 
   @@index([teacherId])
   @@index([slug])
@@ -394,4 +404,51 @@ model AssignmentSubmission {
   @@index([assignmentId])
   @@index([studentId])
   @@map("assignment_submissions")
+}
+
+// ─── Gamification ────────────────────────────────────────────────────────────
+
+model Badge {
+  id          String        @id @default(uuid())
+  name        String
+  description String        @db.Text
+  icon        String
+  category    BadgeCategory @default(LEARNING)
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  userBadges  UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  badgeId   String   @map("badge_id")
+  earnedAt  DateTime @default(now()) @map("earned_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@index([badgeId])
+  @@map("user_badges")
+}
+
+model Certificate {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  courseId  String   @map("course_id")
+  pdfUrl    String?  @map("pdf_url")
+  issuedAt  DateTime @default(now()) @map("issued_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+  @@map("certificates")
 }

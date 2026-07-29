@@ -18,6 +18,7 @@ import { EnrollmentsModule } from './enrollments/enrollments.module';
 import { LessonProgressModule } from './lesson-progress/lesson-progress.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { DiscussionsModule } from './discussions/discussions.module';
+import { GamificationModule } from './gamification/gamification.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 
@@ -42,6 +43,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
     LessonProgressModule,
     NotificationsModule,
     DiscussionsModule,
+    GamificationModule,
   ],
   controllers: [AppController],
   providers: [
