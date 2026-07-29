@@ -81,7 +81,7 @@ export function TeacherProfileView({ profile }: TeacherProfileViewProps) {
             <div className="flex flex-wrap gap-2">
               {teacherInfo.expertise?.length > 0 ? (
                 teacherInfo.expertise.map((exp: string, idx: number) => (
-                  <Badge key={idx} variant="secondary" className="font-semibold text-[11px] bg-secondary border-border/40">
+                  <Badge key={idx} variant="outline" className="font-semibold text-[11px] bg-secondary border-border/40">
                     {exp}
                   </Badge>
                 ))
@@ -266,7 +266,7 @@ export function TeacherProfileView({ profile }: TeacherProfileViewProps) {
                             {course.isPublished ? (
                               <Badge variant="success" className="text-[9px]">Published</Badge>
                             ) : (
-                              <Badge variant="secondary" className="text-[9px]">Draft</Badge>
+                              <Badge variant="outline" className="text-[9px]">Draft</Badge>
                             )}
                           </div>
                         </div>
