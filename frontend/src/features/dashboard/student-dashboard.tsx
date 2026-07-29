@@ -14,6 +14,9 @@ import { GlassCard } from '@/components/layout/glass-card';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { formatPercent } from '@/lib/utils';
+import { DailyReminderBanner } from '@/components/layout/daily-reminder-banner';
+import { SkillTree } from '@/features/student/skill-tree';
+import { AssignmentUploader } from '@/features/student/assignment-uploader';
 
 function getStudentGroupLabel(score: number) {
   if (score >= 80) return { label: 'Nhóm xuất sắc', variant: 'success' as const };
@@ -63,6 +66,9 @@ export function StudentDashboardView() {
           </div>
         }
       />
+
+      {/* Daily Study Streak Reminder */}
+      <DailyReminderBanner streak={data.learningStreak} />
 
       {/* Recommended Lesson AI Banner */}
       {data.recommendedLesson && (
@@ -117,6 +123,9 @@ export function StudentDashboardView() {
         />
       </div>
 
+      {/* Skill Tree Competency Map */}
+      <SkillTree strongTopics={data.strongTopics} weakTopics={data.weakTopics} />
+
       {/* Performance Chart & Course Progress */}
       <div className="grid gap-6 lg:grid-cols-2">
         <GlassCard>
@@ -147,6 +156,9 @@ export function StudentDashboardView() {
           </GlassCard>
         )}
       </div>
+
+      {/* Assignment Upload Section */}
+      <AssignmentUploader />
 
       {/* Strong & Weak Topics */}
       <div className="grid gap-6 lg:grid-cols-2">

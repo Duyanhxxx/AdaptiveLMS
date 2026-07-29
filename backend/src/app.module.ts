@@ -17,6 +17,7 @@ import { AiModule } from './ai/ai.module';
 import { EnrollmentsModule } from './enrollments/enrollments.module';
 import { LessonProgressModule } from './lesson-progress/lesson-progress.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { DiscussionsModule } from './discussions/discussions.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 
@@ -40,6 +41,7 @@ import { RolesGuard } from './auth/guards/roles.guard';
     EnrollmentsModule,
     LessonProgressModule,
     NotificationsModule,
+    DiscussionsModule,
   ],
   controllers: [AppController],
   providers: [

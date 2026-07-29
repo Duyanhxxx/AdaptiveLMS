@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { GlassCard } from '@/components/layout/glass-card';
 import { QuizTaker } from '@/features/student/quiz-taker';
 import { AiLessonAssistant } from '@/features/student/ai-lesson-assistant';
+import { LessonDiscussion } from '@/features/student/lesson-discussion';
 
 function getYouTubeEmbedUrl(url?: string | null) {
   if (!url) return null;
@@ -170,6 +171,9 @@ export default function LessonDetailPage({
           )}
         </div>
       )}
+
+      {/* Lesson Discussions & Reactions */}
+      <LessonDiscussion lessonId={lessonId} />
 
       {/* Floating AI Tutor Assistant */}
       <AiLessonAssistant lessonTitle={lesson.title} lessonContent={lesson.content} />

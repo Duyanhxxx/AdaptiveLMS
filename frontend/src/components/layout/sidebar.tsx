@@ -12,6 +12,7 @@ import {
   Users,
   Megaphone,
   UserCircle,
+  Calendar,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
@@ -21,6 +22,7 @@ const studentLinks = [
   { href: '/student/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/courses', label: 'Khóa học', icon: BookOpen },
   { href: '/recommendations', label: 'Gợi ý AI', icon: Sparkles },
+  { href: '/calendar', label: 'Lịch học cá nhân', icon: Calendar },
   { href: '/profile', label: 'Hồ sơ cá nhân', icon: UserCircle },
 ];
 
