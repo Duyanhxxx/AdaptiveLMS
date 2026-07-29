@@ -89,13 +89,15 @@ export default function ProfilePage() {
           {/* Gamification Rank Widget */}
           <GlassCard className="border border-amber-500/30 bg-amber-500/5 p-4 text-center space-y-3">
             <div className="flex items-center justify-center gap-1.5 text-amber-500 font-bold text-sm">
-              <Trophy className="h-4 w-4" /> Level 5 · Scholar Rank
+              <Trophy className="h-4 w-4" /> Level {Math.floor((badgesData?.earned?.length || 0) * 100 / 300) + 1}
             </div>
-            <p className="text-xs font-bold text-foreground">1,450 / 2,000 XP (Kế tiếp: Level 6)</p>
-            <Progress value={72} className="h-2 bg-amber-500/20" />
+            <p className="text-xs font-bold text-foreground">
+              {((badgesData?.earned?.length || 0) * 100).toLocaleString()} / {((Math.floor((badgesData?.earned?.length || 0) * 100 / 300) + 1) * 300).toLocaleString()} XP (Kế tiếp: Level {Math.floor((badgesData?.earned?.length || 0) * 100 / 300) + 2})
+            </p>
+            <Progress value={(((badgesData?.earned?.length || 0) * 100) % 300) / 300 * 100} className="h-2 bg-amber-500/20" />
             <div className="flex justify-between text-[10px] text-muted-foreground font-semibold pt-1">
               <span>Novice</span>
-              <span className="text-amber-500">Scholar</span>
+              <span className="text-amber-500">Tiến trình</span>
               <span>Grandmaster</span>
             </div>
           </GlassCard>

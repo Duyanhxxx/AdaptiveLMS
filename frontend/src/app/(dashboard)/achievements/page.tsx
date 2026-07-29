@@ -92,7 +92,9 @@ export default function AchievementsPage() {
           </div>
           <div>
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tổng điểm thưởng XP</p>
-            <p className="text-2xl font-bold text-primary">1,450 XP</p>
+            <p className="text-2xl font-bold text-primary">
+              {badgeCollection.filter(b => b.unlocked).reduce((sum, b) => sum + b.xp, 0).toLocaleString()} XP
+            </p>
           </div>
         </GlassCard>
 
@@ -102,7 +104,9 @@ export default function AchievementsPage() {
           </div>
           <div>
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Cấp độ hiện tại</p>
-            <p className="text-2xl font-bold text-emerald-500">Level 5 Scholar</p>
+            <p className="text-2xl font-bold text-emerald-500">
+              Level {Math.floor(badgeCollection.filter(b => b.unlocked).reduce((sum, b) => sum + b.xp, 0) / 300) + 1}
+            </p>
           </div>
         </GlassCard>
       </div>
