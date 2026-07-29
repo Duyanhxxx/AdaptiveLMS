@@ -150,6 +150,7 @@ export class UsersService {
         avatarUrl: true,
         createdAt: true,
         studentProfile: true,
+        teacherProfile: true,
       },
     });
 
@@ -157,6 +158,31 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
+    if (user.role === Role.TEACHER) {
+      // Fetch teacher specific stats
+      const courses = await this.prisma.course.findMany({
+        where: { teacherId: userId },
+        include: {
+          _count: { select: { enrollments: true, lessons: true } },
+        },
+      });
+
+      const totalStudents = courses.reduce((sum, c) => sum + c._count.enrollments, 0);
+      const totalCourses = courses.length;
+      const publishedCourses = courses.filter((c) => c.isPublished).length;
+      
+      const teacherStats = {
+        totalStudents,
+        totalCourses,
+        publishedCourses,
+        draftCourses: totalCourses - publishedCourses,
+        courses,
+      };
+
+      return { ...user, teacherStats };
+    }
+
+    // Default to student profile logic
     const enrollments = await this.prisma.enrollment.findMany({
       where: { studentId: userId },
       include: {

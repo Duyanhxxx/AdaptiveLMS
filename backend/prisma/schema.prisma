@@ -80,6 +80,7 @@ model User {
   updatedAt    DateTime @updatedAt @map("updated_at")
 
   studentProfile  StudentProfile?
+  teacherProfile  TeacherProfile?
   refreshTokens   RefreshToken[]
   coursesTeaching Course[]         @relation("CourseTeacher")
   enrollments     Enrollment[]
@@ -94,6 +95,26 @@ model User {
   certificates    Certificate[]
 
   @@map("users")
+}
+
+model TeacherProfile {
+  id                 String   @id @default(uuid())
+  userId             String   @unique @map("user_id")
+  bio                String?  @db.Text
+  specialization     String?
+  teachingExperience Int      @default(0) @map("teaching_experience") // years
+  expertise          String[] @default([])
+  education          String?
+  certifications     String[] @default([])
+  followers          Int      @default(0)
+  averageRating      Float    @default(0) @map("average_rating")
+  totalReviews       Int      @default(0) @map("total_reviews")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("teacher_profiles")
 }
 
 model RefreshToken {
