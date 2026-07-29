@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { Award, BookOpen, Flame, Target, Sparkles, ArrowRight } from 'lucide-react';
+import { Award, BookOpen, Flame, Target, Sparkles, ArrowRight, Calendar as CalendarIcon, CheckCircle2, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { analyticsService } from '@/services/analytics.service';
 import { StatCard } from '@/features/dashboard/stat-card';
@@ -16,7 +16,6 @@ import { Button } from '@/components/ui/button';
 import { formatPercent } from '@/lib/utils';
 import { DailyReminderBanner } from '@/components/layout/daily-reminder-banner';
 import { SkillTree } from '@/features/student/skill-tree';
-import { AssignmentUploader } from '@/features/student/assignment-uploader';
 
 function getStudentGroupLabel(score: number) {
   if (score >= 80) return { label: 'Nhóm xuất sắc', variant: 'success' as const };
@@ -57,7 +56,7 @@ export function StudentDashboardView() {
     <div className="space-y-8">
       <PageHeader
         title={`Xin chào, ${data.student.name}!`}
-        description="Tổng quan tiến độ học tập, điểm số và gợi ý bài học cá nhân hóa"
+        description="Tổng quan tiến độ học tập, mục tiêu tuần và bài học tiếp theo từ AI"
         icon={Target}
         action={
           <div className="flex gap-2">
@@ -123,6 +122,68 @@ export function StudentDashboardView() {
         />
       </div>
 
+      {/* Goals & Upcoming Items Section */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Today's & Weekly Goal */}
+        <GlassCard className="space-y-4">
+          <div className="flex items-center justify-between border-b border-border pb-3">
+            <div className="flex items-center gap-2">
+              <Target className="h-5 w-5 text-primary" />
+              <h3 className="font-bold text-sm text-foreground">Mục tiêu học tập (Goals)</h3>
+            </div>
+            <Badge variant="primary" className="text-[10px]">Weekly Focus</Badge>
+          </div>
+          <div className="space-y-3">
+            <div className="p-3 rounded-lg border border-primary/20 bg-primary/5 space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-foreground">Mục tiêu hôm nay: Học 30 phút</span>
+                <Badge variant="success" className="text-[9px]">Hoàn thành</Badge>
+              </div>
+              <Progress value={100} className="h-1.5" />
+            </div>
+
+            <div className="p-3 rounded-lg border border-border bg-secondary/20 space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-foreground">Mục tiêu tuần này: Hoàn thành 3 Quiz</span>
+                <span className="text-[10px] font-bold text-primary">2 / 3 Quiz</span>
+              </div>
+              <Progress value={66} className="h-1.5" />
+            </div>
+          </div>
+        </GlassCard>
+
+        {/* Upcoming Quizzes & Deadlines */}
+        <GlassCard className="space-y-4">
+          <div className="flex items-center justify-between border-b border-border pb-3">
+            <div className="flex items-center gap-2">
+              <Clock className="h-5 w-5 text-amber-500" />
+              <h3 className="font-bold text-sm text-foreground">Hạn nộp & Quiz sắp tới</h3>
+            </div>
+            <Link href="/calendar">
+              <Button variant="ghost" size="sm" className="text-xs text-primary">
+                Xem Lịch học →
+              </Button>
+            </Link>
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-card">
+              <div>
+                <p className="text-xs font-bold text-foreground">Quiz Đánh giá Kỹ năng Frontend</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Thời hạn: 23:59 Chủ Nhật tuần này</p>
+              </div>
+              <Badge variant="warning" className="text-[9px]">Sắp tới hạn</Badge>
+            </div>
+            <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-card">
+              <div>
+                <p className="text-xs font-bold text-foreground">Bài kiểm tra cuối Module React</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Thời hạn: Thứ Tư tuần sau</p>
+              </div>
+              <Badge variant="outline" className="text-[9px]">Upcoming</Badge>
+            </div>
+          </div>
+        </GlassCard>
+      </div>
+
       {/* Skill Tree Competency Map */}
       <SkillTree strongTopics={data.strongTopics} weakTopics={data.weakTopics} />
 
@@ -156,9 +217,6 @@ export function StudentDashboardView() {
           </GlassCard>
         )}
       </div>
-
-      {/* Assignment Upload Section */}
-      <AssignmentUploader />
 
       {/* Strong & Weak Topics */}
       <div className="grid gap-6 lg:grid-cols-2">
