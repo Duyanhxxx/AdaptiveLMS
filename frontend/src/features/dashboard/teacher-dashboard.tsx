@@ -115,36 +115,34 @@ export function TeacherDashboardView() {
             <StatCard title="Phân luồng hỗ trợ" value={`${needsSupportGroup?.count ?? 0} nguy cơ`} icon={AlertTriangle} color="rose" />
           </div>
 
-          {/* High Priority Alert: Students at Risk */}
-          {needsSupportGroup && needsSupportGroup.students.length > 0 && (
-            <div className="relative overflow-hidden rounded-xl border border-rose-500/30 bg-gradient-to-r from-rose-500/10 via-rose-500/5 to-transparent p-5 shadow-sm">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-rose-500/20 text-rose-500">
-                    <AlertTriangle className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider">
-                        Cảnh báo Học viên Cần hỗ trợ (Students at Risk)
-                      </span>
-                      <Badge variant="destructive" className="text-[10px]">
-                        {needsSupportGroup.count} học viên
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-foreground font-medium mt-0.5">
-                      Có {needsSupportGroup.count} học viên thuộc nhóm nguy cơ (Điểm TB &lt; 50%). Hệ thống AI đề xuất Gửi Email Động viên và Bài tập Bổ trợ.
-                    </p>
-                  </div>
+          {/* High Priority Alert: Students at Risk (Always visible for UI demo) */}
+          <div className="relative overflow-hidden rounded-xl border border-rose-500/30 bg-gradient-to-r from-rose-500/10 via-rose-500/5 to-transparent p-5 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-rose-500/20 text-rose-500">
+                  <AlertTriangle className="h-5 w-5" />
                 </div>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline" className="text-xs border-rose-500/30 text-rose-600 font-semibold hover:bg-rose-500/10">
-                    <Sparkles className="mr-1.5 h-3.5 w-3.5" /> Dùng AI tạo Email hỗ trợ
-                  </Button>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider">
+                      Cảnh báo Học viên Cần hỗ trợ (Students at Risk)
+                    </span>
+                    <Badge variant="destructive" className="text-[10px]">
+                      {needsSupportGroup?.count || 3} học viên
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-foreground font-medium mt-0.5">
+                    Có {needsSupportGroup?.count || 3} học viên thuộc nhóm nguy cơ (Điểm TB &lt; 50%). Hệ thống AI đề xuất Gửi Email Động viên và Bài tập Bổ trợ.
+                  </p>
                 </div>
               </div>
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" className="text-xs border-rose-500/30 text-rose-600 font-semibold hover:bg-rose-500/10 shadow-sm transition-all active:scale-95">
+                  <Sparkles className="mr-1.5 h-3.5 w-3.5" /> Dùng AI tạo Email hỗ trợ
+                </Button>
+              </div>
             </div>
-          )}
+          </div>
 
           {/* 3 Student Groups Matrix */}
           <GlassCard className="space-y-4">
