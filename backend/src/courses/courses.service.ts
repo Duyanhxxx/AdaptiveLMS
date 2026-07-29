@@ -66,9 +66,11 @@ export class CoursesService {
     return buildPaginatedResult(courses, total, page, limit);
   }
 
-  async findOne(id: string, role: Role) {
-    const course = await this.prisma.course.findUnique({
-      where: { id },
+  async findOne(idOrSlug: string, role: Role) {
+    const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(idOrSlug);
+    
+    const course = await this.prisma.course.findFirst({
+      where: isUuid ? { id: idOrSlug } : { slug: idOrSlug },
       include: {
         ...COURSE_INCLUDE,
         lessons: {

@@ -34,13 +34,13 @@ export class CoursesController {
     return this.coursesService.findAll(query, user.role as Role);
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get course by ID with lessons' })
+  @Get(':idOrSlug')
+  @ApiOperation({ summary: 'Get course by ID or slug with lessons' })
   findOne(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('idOrSlug') idOrSlug: string,
     @CurrentUser() user: JwtPayload,
   ) {
-    return this.coursesService.findOne(id, user.role as Role);
+    return this.coursesService.findOne(idOrSlug, user.role as Role);
   }
 
   @Post()
