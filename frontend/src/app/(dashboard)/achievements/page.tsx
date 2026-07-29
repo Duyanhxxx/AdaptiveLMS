@@ -7,6 +7,7 @@ import { analyticsService } from '@/services/analytics.service';
 import { GlassCard } from '@/components/layout/glass-card';
 import { PageHeader } from '@/components/layout/page-header';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
