@@ -240,8 +240,36 @@ export interface LessonDetail extends Lesson {
 export interface AdminDashboard {
   summary: {
     totalCourses: number;
+    publishedCourses?: number;
     totalStudents: number;
+    totalTeachers?: number;
+    totalAdmins?: number;
+    totalUsers?: number;
     classAverageScore: number;
+    estimatedRevenue?: number;
+    monthlyRevenue?: number;
+  };
+  systemHealth?: {
+    status: string;
+    uptime: string;
+    cpuUsage: string;
+    memoryUsage: string;
+    dbConnections: number;
+    apiLatencyMs: number;
+    activeUsers24h: number;
+    storageUsedGb: number;
+    storageMaxGb: number;
+  };
+  aiUsage?: {
+    totalRequests: number;
+    totalTokens: number;
+    estimatedCostUsd: number;
+    aiGenerateQuizCount: number;
+  };
+  qualityMetrics?: {
+    completionRate: number;
+    dropoutRate: number;
+    avgQuizScore: number;
   };
   topStudents: Array<{
     id: string;
@@ -255,6 +283,30 @@ export interface AdminDashboard {
     name: string;
     email: string;
     averageScore: number;
+  }>;
+  topCourses?: Array<{
+    id: string;
+    title: string;
+    teacherName: string;
+    studentsCount: number;
+    lessonsCount: number;
+    rating: number;
+  }>;
+  topTeachers?: Array<{
+    id: string;
+    name: string;
+    email: string;
+    coursesCount: number;
+    totalStudents: number;
+    rating: number;
+  }>;
+  systemLogs?: Array<{
+    id: string;
+    event: string;
+    user: string;
+    role: string;
+    timestamp: string;
+    status: string;
   }>;
 }
 
