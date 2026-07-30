@@ -14,6 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { GlassCard } from '@/components/layout/glass-card';
 import { PageHeader } from '@/components/layout/page-header';
 import { TeacherProfileView } from '@/features/profile/teacher-profile-view';
+import { AdminWorkspaceView } from '@/features/profile/admin-workspace-view';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
@@ -62,6 +63,10 @@ export default function ProfilePage() {
 
   if (profile.role === 'TEACHER') {
     return <TeacherProfileView profile={profile} />;
+  }
+
+  if (profile.role === 'ADMIN') {
+    return <AdminWorkspaceView profile={profile} />;
   }
 
   return (
