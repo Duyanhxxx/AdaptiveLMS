@@ -41,7 +41,7 @@ const teacherLinks = [
 
 const adminLinks = [
   { href: '/admin/dashboard', label: 'Tổng quan Hệ thống', icon: LayoutDashboard },
-  { href: '/courses', label: 'Quản lý Khóa học', icon: BookOpen },
+  { href: '/admin/courses', label: 'Quản lý Khóa học', icon: BookOpen },
   { href: '/admin/users', label: 'Quản lý Người dùng', icon: Users },
   { href: '/admin/broadcast', label: 'Thông báo Broadcast', icon: Megaphone },
   { href: '/profile', label: 'Hồ sơ cá nhân', icon: UserCircle },
