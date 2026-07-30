@@ -49,7 +49,40 @@ export function AdminCourseManagement() {
     },
   });
 
-  // Toggle Publish Status Mutation
+  // Edit Course State
+  const [editingCourse, setEditingCourse] = useState<Course | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editDifficulty, setEditDifficulty] = useState<'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED'>('BEGINNER');
+
+  // Update Course Mutation
+  const updateMutation = useMutation({
+    mutationFn: (payload: { id: string; title: string; description: string; difficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED' }) =>
+      coursesService.update(payload.id, {
+        title: payload.title,
+        description: payload.description,
+        difficulty: payload.difficulty,
+      }),
+    onSuccess: () => {
+      toast.success('Đã cập nhật thông tin khóa học!');
+      queryClient.invalidateQueries({ queryKey: ['admin-courses'] });
+      setEditingCourse(null);
+    },
+    onError: () => {
+      toast.error('Không thể cập nhật khóa học.');
+    },
+  });
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingCourse || !editTitle || !editDescription) return;
+    updateMutation.mutate({
+      id: editingCourse.id,
+      title: editTitle,
+      description: editDescription,
+      difficulty: editDifficulty,
+    });
+  };
   const togglePublishMutation = useMutation({
     mutationFn: ({ id, isPublished }: { id: string; isPublished: boolean }) =>
       coursesService.update(id, { isPublished }),
@@ -231,6 +264,20 @@ export function AdminCourseManagement() {
                       <Button
                         variant="ghost"
                         size="sm"
+                        title="Chỉnh sửa thông tin khóa học"
+                        onClick={() => {
+                          setEditingCourse(c);
+                          setEditTitle(c.title);
+                          setEditDescription(c.description);
+                          setEditDifficulty(c.difficulty);
+                        }}
+                      >
+                        <Edit3 className="h-4 w-4 text-indigo-500" />
+                      </Button>
+
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         title={c.isPublished ? 'Hủy xuất bản' : 'Xuất bản khóa học'}
                         onClick={() =>
                           togglePublishMutation.mutate({ id: c.id, isPublished: !c.isPublished })
@@ -263,6 +310,63 @@ export function AdminCourseManagement() {
           </div>
         )}
       </GlassCard>
+
+      {/* Edit Course Modal */}
+      {editingCourse && (
+        <GlassCard className="p-6 border-2 border-indigo-500/30 animate-in slide-in-from-top-4 duration-300">
+          <h3 className="text-lg font-bold mb-1 flex items-center gap-2">
+            <Edit3 className="h-5 w-5 text-indigo-500" /> Chỉnh sửa Khóa học: {editingCourse.title}
+          </h3>
+          <p className="text-xs text-muted-foreground mb-4">
+            Cập nhật tên, mô tả và độ khó của khóa học.
+          </p>
+
+          <form onSubmit={handleEditSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="editTitle">Tên Khóa học</Label>
+              <Input
+                id="editTitle"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="editDescription">Mô tả Khóa học</Label>
+              <textarea
+                id="editDescription"
+                rows={3}
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="editDifficulty">Cấp độ Khóa học</Label>
+              <select
+                id="editDifficulty"
+                value={editDifficulty}
+                onChange={(e) => setEditDifficulty(e.target.value as any)}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+              >
+                <option value="BEGINNER">BEGINNER (Cơ bản)</option>
+                <option value="INTERMEDIATE">INTERMEDIATE (Trung cấp)</option>
+                <option value="ADVANCED">ADVANCED (Nâng cao)</option>
+              </select>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-2">
+              <Button variant="outline" type="button" onClick={() => setEditingCourse(null)}>
+                Hủy
+              </Button>
+              <Button type="submit" disabled={updateMutation.isPending}>
+                {updateMutation.isPending ? 'Đang lưu...' : 'Lưu thay đổi'}
+              </Button>
+            </div>
+          </form>
+        </GlassCard>
+      )}
     </div>
   );
 }
