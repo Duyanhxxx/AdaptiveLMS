@@ -27,7 +27,7 @@ export function AdminCourseManagement() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['admin-courses', search],
     queryFn: () =>
-      coursesService.list({
+      coursesService.getAll({
         limit: '100',
         search: search || undefined,
       }),
