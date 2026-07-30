@@ -19,8 +19,8 @@ const assignmentsService = {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignments/pending-grading`, {
       headers: { Authorization: `Bearer ${localStorage.getItem('adaptive_access_token')}` }
     });
-    if (!res.ok) throw new Error('Failed to fetch pending submissions');
-    return res.json();
+    const json = await res.json();
+    return json.data;
   },
   gradeSubmission: async (id: string, data: any) => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignments/submissions/${id}/grade`, {
@@ -32,7 +32,8 @@ const assignmentsService = {
       body: JSON.stringify(data)
     });
     if (!res.ok) throw new Error('Failed to grade submission');
-    return res.json();
+    const json = await res.json();
+    return json.data;
   }
 };
 

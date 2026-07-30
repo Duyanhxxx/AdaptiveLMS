@@ -18,8 +18,8 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/analytics/student/${studentId}/dashboard`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('adaptive_access_token')}` }
       });
-      if (!res.ok) throw new Error('Failed to fetch student details');
-      return res.json();
+      const json = await res.json();
+      return json.data;
     }
   });
 

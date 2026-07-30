@@ -32,7 +32,8 @@ export function CreateAssignmentView({ lessonId }: { lessonId: string }) {
         body: JSON.stringify({ ...data, lessonId }),
       });
       if (!res.ok) throw new Error('Failed to create assignment');
-      return res.json();
+      const json = await res.json();
+      return json.data;
     },
     onSuccess: () => {
       toast.success('Tạo bài tập thành công!');

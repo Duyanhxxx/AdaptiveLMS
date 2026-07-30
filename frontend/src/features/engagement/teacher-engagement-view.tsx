@@ -21,8 +21,8 @@ export function TeacherEngagementView() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/discussions/teacher/unanswered`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('adaptive_access_token')}` }
       });
-      if (!res.ok) throw new Error('Failed to fetch discussions');
-      return res.json();
+      const json = await res.json();
+      return json.data;
     }
   });
 
@@ -36,8 +36,8 @@ export function TeacherEngagementView() {
         },
         body: JSON.stringify(data),
       });
-      if (!res.ok) throw new Error('Failed to reply');
-      return res.json();
+      const json = await res.json();
+      return json.data;
     },
     onSuccess: () => {
       toast.success('Đã gửi câu trả lời!');

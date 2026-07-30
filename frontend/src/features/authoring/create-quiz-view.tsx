@@ -31,8 +31,8 @@ export function CreateQuizView({ lessonId }: { lessonId: string }) {
         },
         body: JSON.stringify({ lessonId, title, description }),
       });
-      if (!res.ok) throw new Error('Failed to create quiz');
-      return res.json();
+      const json = await res.json();
+      return json.data;
     },
     onSuccess: () => {
       toast.success('Đã xuất bản Quiz thành công!');
@@ -57,7 +57,8 @@ export function CreateQuizView({ lessonId }: { lessonId: string }) {
         }),
       });
       if (!res.ok) throw new Error('AI failed');
-      return res.json();
+      const json = await res.json();
+      return json.data;
     },
     onSuccess: (data) => {
       setQuestions(data);
