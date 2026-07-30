@@ -13,7 +13,7 @@ export function TeacherAnalyticsView() {
     queryKey: ['teacher-analytics'],
     queryFn: async () => {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/analytics/teacher/dashboard`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem('adaptive_access_token')}` }
       });
       if (!res.ok) throw new Error('Failed to fetch analytics');
       return res.json();

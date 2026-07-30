@@ -27,7 +27,7 @@ export function CreateAssignmentView({ lessonId }: { lessonId: string }) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('adaptive_access_token')}`,
         },
         body: JSON.stringify({ ...data, lessonId }),
       });
@@ -48,7 +48,7 @@ export function CreateAssignmentView({ lessonId }: { lessonId: string }) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('adaptive_access_token')}`,
         },
         body: JSON.stringify({ 
           topic: formData.title || 'Phát triển ứng dụng Web', 

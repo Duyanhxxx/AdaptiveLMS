@@ -17,7 +17,7 @@ import { toast } from 'sonner';
 const assignmentsService = {
   getPendingSubmissions: async () => {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/assignments/pending-grading`, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      headers: { Authorization: `Bearer ${localStorage.getItem('adaptive_access_token')}` }
     });
     if (!res.ok) throw new Error('Failed to fetch pending submissions');
     return res.json();
@@ -27,7 +27,7 @@ const assignmentsService = {
       method: 'PATCH',
       headers: { 
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}` 
+        Authorization: `Bearer ${localStorage.getItem('adaptive_access_token')}` 
       },
       body: JSON.stringify(data)
     });

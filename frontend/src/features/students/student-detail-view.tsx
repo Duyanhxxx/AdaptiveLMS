@@ -16,7 +16,7 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
     queryKey: ['student-detail', studentId],
     queryFn: async () => {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/analytics/student/${studentId}/dashboard`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem('adaptive_access_token')}` }
       });
       if (!res.ok) throw new Error('Failed to fetch student details');
       return res.json();

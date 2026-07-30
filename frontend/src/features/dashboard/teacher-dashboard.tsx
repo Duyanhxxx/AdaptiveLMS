@@ -409,7 +409,7 @@ export function TeacherDashboardView() {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                        Authorization: `Bearer ${localStorage.getItem('adaptive_access_token')}`
                       },
                       body: JSON.stringify({ title, message, type: 'SYSTEM' })
                     });

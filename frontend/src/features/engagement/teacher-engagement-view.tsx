@@ -19,7 +19,7 @@ export function TeacherEngagementView() {
     queryKey: ['teacher-discussions'],
     queryFn: async () => {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/discussions/teacher/unanswered`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem('adaptive_access_token')}` }
       });
       if (!res.ok) throw new Error('Failed to fetch discussions');
       return res.json();
@@ -32,7 +32,7 @@ export function TeacherEngagementView() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('adaptive_access_token')}`,
         },
         body: JSON.stringify(data),
       });

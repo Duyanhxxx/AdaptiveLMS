@@ -27,7 +27,7 @@ export function CreateQuizView({ lessonId }: { lessonId: string }) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('adaptive_access_token')}`,
         },
         body: JSON.stringify({ lessonId, title, description }),
       });
@@ -48,7 +48,7 @@ export function CreateQuizView({ lessonId }: { lessonId: string }) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('adaptive_access_token')}`,
         },
         body: JSON.stringify({ 
           topic: title || 'Tổng hợp kiến thức khóa học', 
