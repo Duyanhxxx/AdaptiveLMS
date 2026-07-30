@@ -45,14 +45,16 @@ export function UserManagement() {
   // Query Users List
   const { data, isLoading, error } = useQuery({
     queryKey: ['admin-users', search, roleFilter],
-    queryFn: () =>
-      usersService.list({
+    queryFn: () => {
+      const params: Record<string, string> = {
         limit: '100',
         sortBy: 'createdAt',
         sortOrder: 'desc',
-        search: search || undefined,
-        role: roleFilter !== 'ALL' ? roleFilter : undefined,
-      }),
+      };
+      if (search) params.search = search;
+      if (roleFilter !== 'ALL') params.role = roleFilter;
+      return usersService.list(params);
+    },
   });
 
   // Create User Mutation
