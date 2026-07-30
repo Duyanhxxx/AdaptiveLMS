@@ -1,11 +1,12 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import { Plus, CheckCircle2, HelpCircle } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Plus, CheckCircle2, HelpCircle, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { quizService } from '@/services/quiz.service';
+import { toast } from 'sonner';
 
 export function QuizItem({
   quiz,
@@ -31,9 +32,30 @@ export function QuizItem({
   setNewQuestion: (v: typeof newQuestion) => void;
   setQuestionFormFor: (v: string | null) => void;
 }) {
+  const queryClient = useQueryClient();
+
   const { data: quizDetail } = useQuery({
     queryKey: ['quiz', quiz.id],
     queryFn: () => quizService.getById(quiz.id, true),
+  });
+
+  const deleteQuizMutation = useMutation({
+    mutationFn: () => quizService.delete(quiz.id),
+    onSuccess: () => {
+      toast.success('Đã xóa Quiz thành công!');
+      queryClient.invalidateQueries({ queryKey: ['quiz', quiz.id] });
+      queryClient.invalidateQueries({ queryKey: ['lessons'] });
+    },
+    onError: () => toast.error('Không thể xóa Quiz này.'),
+  });
+
+  const deleteQuestionMutation = useMutation({
+    mutationFn: (questionId: string) => quizService.deleteQuestion(questionId),
+    onSuccess: () => {
+      toast.success('Đã xóa câu hỏi thành công!');
+      queryClient.invalidateQueries({ queryKey: ['quiz', quiz.id] });
+    },
+    onError: () => toast.error('Không thể xóa câu hỏi.'),
   });
 
   const parsedOptions = newQuestion.options
@@ -49,10 +71,26 @@ export function QuizItem({
             {quiz._count?.questions ?? 0} câu hỏi · Yêu cầu đạt {quiz.passingScore}%
           </p>
         </div>
-        <Button variant="outline" size="sm" className="h-8 text-xs font-semibold" onClick={onShowQuestionForm}>
-          <Plus className="mr-1 h-3.5 w-3.5 text-primary" />
-          Thêm câu hỏi
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" className="h-8 text-xs font-semibold" onClick={onShowQuestionForm}>
+            <Plus className="mr-1 h-3.5 w-3.5 text-primary" />
+            Thêm câu hỏi
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 text-destructive hover:bg-destructive/10"
+            title="Xóa Quiz này"
+            onClick={() => {
+              if (confirm(`Bạn có chắc chắn muốn xóa Quiz "${quiz.title}"?`)) {
+                deleteQuizMutation.mutate();
+              }
+            }}
+            disabled={deleteQuizMutation.isPending}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       {questionFormFor === quiz.id && (
@@ -174,11 +212,26 @@ export function QuizItem({
                 </Badge>
                 <span className="text-xs font-semibold text-primary">{q.points} điểm</span>
               </div>
-              {q.topic && (
-                <Badge variant="primary" className="text-[10px]">
-                  {q.topic}
-                </Badge>
-              )}
+              <div className="flex items-center gap-2">
+                {q.topic && (
+                  <Badge variant="primary" className="text-[10px]">
+                    {q.topic}
+                  </Badge>
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 text-destructive hover:bg-destructive/10"
+                  title="Xóa câu hỏi này"
+                  onClick={() => {
+                    if (confirm('Bạn có chắc chắn muốn xóa câu hỏi này?')) {
+                      deleteQuestionMutation.mutate(q.id);
+                    }
+                  }}
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+              </div>
             </div>
             <p className="mt-1.5 font-medium text-foreground text-xs">
               <span className="font-bold text-muted-foreground">Q{idx + 1}:</span> {q.text}
