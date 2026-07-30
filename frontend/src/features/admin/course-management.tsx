@@ -26,11 +26,11 @@ export function AdminCourseManagement() {
   // Query Courses List (Admin can see published & draft courses)
   const { data, isLoading, error } = useQuery({
     queryKey: ['admin-courses', search],
-    queryFn: () =>
-      coursesService.getAll({
-        limit: '100',
-        search: search || undefined,
-      }),
+    queryFn: () => {
+      const params: Record<string, string> = { limit: '100' };
+      if (search) params.search = search;
+      return coursesService.getAll(params);
+    },
   });
 
   // Create Course Mutation
