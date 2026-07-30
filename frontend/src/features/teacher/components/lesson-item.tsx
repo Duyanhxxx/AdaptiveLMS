@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { ArrowDown, ArrowUp, Pencil, Plus, Trash2, Video } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { ArrowDown, ArrowUp, Pencil, Plus, Trash2, Video, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { GlassCard } from '@/components/layout/glass-card';
 import { lessonsService } from '@/services/lessons.service';
+import { quizService } from '@/services/quiz.service';
+import { toast } from 'sonner';
 import { QuizItem } from './quiz-item';
 
 export function LessonItem({
@@ -63,10 +65,64 @@ export function LessonItem({
   setQuizFormFor: (v: string | null) => void;
   setQuestionFormFor: (v: string | null) => void;
 }) {
+  const queryClient = useQueryClient();
+  const [isAiGenerating, setIsAiGenerating] = useState(false);
+
   const { data: lessonDetail } = useQuery({
     queryKey: ['lesson-detail', lesson.id],
     queryFn: () => lessonsService.getById(lesson.id),
   });
+
+  const handleAiGenerate = async () => {
+    try {
+      setIsAiGenerating(true);
+      toast.info('AI đang phân tích nội dung bài học để sinh bộ câu hỏi...');
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai/generate-quiz`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('adaptive_access_token')}`,
+        },
+        body: JSON.stringify({
+          topic: lesson.title,
+          description: (lessonDetail?.topics ?? []).join(', ') || 'Kiểm tra trắc nghiệm',
+          count: 5,
+        }),
+      });
+
+      if (!res.ok) throw new Error('AI failed');
+      const json = await res.json();
+      const generatedQuestions = json.data;
+
+      // Create Quiz automatically
+      const createdQuiz = await quizService.create({
+        lessonId: lesson.id,
+        title: `Quiz AI: ${lesson.title}`,
+        passingScore: 60,
+      });
+
+      // Add generated questions to the new quiz
+      if (Array.isArray(generatedQuestions)) {
+        for (const q of generatedQuestions) {
+          await quizService.addQuestion(createdQuiz.id, {
+            text: q.text,
+            type: 'MULTIPLE_CHOICE',
+            options: q.options,
+            correctAnswer: q.options[q.correctIndex || 0] || q.options[0],
+            points: q.points || 1,
+          });
+        }
+      }
+
+      toast.success('AI đã tự động tạo Quiz 5 câu hỏi thành công!');
+      queryClient.invalidateQueries({ queryKey: ['lesson-detail', lesson.id] });
+    } catch (err) {
+      toast.error('Có lỗi xảy ra khi dùng AI tạo Quiz.');
+    } finally {
+      setIsAiGenerating(false);
+    }
+  };
 
   const [editForm, setEditForm] = useState({
     title: lesson.title,
@@ -176,11 +232,25 @@ export function LessonItem({
 
       <div className="mt-4 space-y-3">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-medium">Quiz</p>
-          <Button variant="outline" size="sm" onClick={onShowQuizForm}>
-            <Plus className="h-3 w-3" />
-            Thêm quiz
-          </Button>
+          <p className="text-sm font-semibold flex items-center gap-1.5">
+            Quiz bài học
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-purple-500/10 text-purple-600 border-purple-500/30 hover:bg-purple-500/20 font-bold"
+              onClick={handleAiGenerate}
+              disabled={isAiGenerating}
+            >
+              <Sparkles className="h-3.5 w-3.5 mr-1 text-purple-500" />
+              {isAiGenerating ? 'AI Đang suy nghĩ...' : 'Dùng AI Tạo Quiz'}
+            </Button>
+            <Button variant="outline" size="sm" onClick={onShowQuizForm}>
+              <Plus className="h-3.5 w-3.5 mr-1" />
+              Thêm quiz thủ công
+            </Button>
+          </div>
         </div>
 
         {quizFormFor === lesson.id && (
