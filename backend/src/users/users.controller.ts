@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Patch,
+  Delete,
   Param,
   Body,
   Query,
@@ -68,5 +69,12 @@ export class UsersController {
     @CurrentUser() user: JwtPayload,
   ) {
     return this.usersService.update(id, dto, user.sub, user.role as Role);
+  }
+
+  @Delete(':id')
+  @Roles(Role.ADMIN)
+  @ApiOperation({ summary: 'Delete user account (Admin only)' })
+  remove(@Param('id', ParseUUIDPipe) id: string) {
+    return this.usersService.remove(id);
   }
 }

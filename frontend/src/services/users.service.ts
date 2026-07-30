@@ -20,5 +20,16 @@ export const usersService = {
     }),
 
   getMyProfile: () => apiClient<any>('/users/me/profile'),
+
+  update: (id: string, data: Partial<User>) =>
+    apiClient<User>(`/users/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
+  delete: (id: string) =>
+    apiClient<{ message: string }>(`/users/${id}`, {
+      method: 'DELETE',
+    }),
 };
 
